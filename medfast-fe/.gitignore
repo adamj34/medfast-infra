@@ -1,0 +1,20 @@
+# .gitignore
+
+# Ignore node_modules folder
+node_modules/
+
+# Ignore environment variables and secrets
+.env
+
+# Ignore build folder
+/dist
+/build
+
+# Ignore logs
+*.log
+*storybook.log
+
+# Ignore .vscode folder
+.vscode/
+
+.DS_Store
