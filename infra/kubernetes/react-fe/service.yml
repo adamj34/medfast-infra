@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: medfast-frontend-service
+spec:
+  selector:
+    app: medfast-frontend
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+
+# The service exposes port 80, which is the port used by clients to access the service,
+# and forwards the traffic to the pods’ port 8080, which is where the backend application is running.

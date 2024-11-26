@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medfast-be-config
+data:
+  SERVER_PORT: "8080"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/medfast"
+  SPRING_DATASOURCE_USERNAME: "user"
+  SPRING_DATASOURCE_PASSWORD: "secret"
+  MAIL_PASSWORD: "pyne podv rskn cqof"
+  SPRING_PROFILES_ACTIVE: "prod"  

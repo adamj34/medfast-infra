@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medfast-backend-deployment
+  labels:
+    app: medfast-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medfast-backend
+  template:
+    metadata:
+      labels:
+        app: medfast-backend
+    spec:
+      containers:
+      - name: medfast-backend
+        imagePullPolicy: Never
+        image: medfast-backend:latest
+        envFrom:
+          - configMapRef:
+              name: medfast-be-config  
+        ports:
+        - containerPort: 8080

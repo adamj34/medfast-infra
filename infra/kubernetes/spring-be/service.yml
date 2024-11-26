@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: medfast-backend-service
+spec:
+  selector:
+    app: medfast-backend
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080

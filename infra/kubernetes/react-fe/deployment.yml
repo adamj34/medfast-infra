@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medfast-frontend-deployment
+  labels:
+    app: medfast-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medfast-frontend
+  template:
+    metadata:
+      labels:
+        app: medfast-frontend
+    spec:
+      containers:
+      - name: medfast-frontend
+        imagePullPolicy: Never
+        image: medfast-frontend:latest
+        ports:
+        - containerPort: 80
+          name: http

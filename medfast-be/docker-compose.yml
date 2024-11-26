@@ -13,7 +13,7 @@ services:
 
   backend:
     build: .
-    image: healflowdev/medfast:latest
+    # image: healflowdev/medfast:latest
     depends_on:
       - postgresql
     environment:
@@ -25,39 +25,39 @@ services:
       SPRING_PROFILES_ACTIVE: dev  # Default profile; change to prod as needed
     ports:
       - "8080:8080"
-    links:
-      - logstash
+    # links:
+    #   - logstash
 
-  elasticsearch:
-    image: elasticsearch:7.17.23
-    volumes:
-      - ./config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    environment:
-      - "ES_JAVA_OPTS=-Xmx256m -Xms256m"
+  # elasticsearch:
+  #   image: elasticsearch:7.17.23
+  #   volumes:
+  #     - ./config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xmx256m -Xms256m"
 
-  logstash:
-    image: logstash:7.17.23
-    command: -f /etc/logstash/conf.d/
-    volumes:
-      - ./config/logstash/:/etc/logstash/conf.d/
-    ports:
-      - "9999:9999"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    depends_on:
-      - elasticsearch
+  # logstash:
+  #   image: logstash:7.17.23
+  #   command: -f /etc/logstash/conf.d/
+  #   volumes:
+  #     - ./config/logstash/:/etc/logstash/conf.d/
+  #   ports:
+  #     - "9999:9999"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   depends_on:
+  #     - elasticsearch
 
-  kibana:
-    image: kibana:7.17.23
-    volumes:
-      - ./config/kibana/:/usr/share/kibana/config/
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    command: >
-      sh -c "/usr/share/kibana/config/setup.sh"
+  # kibana:
+  #   image: kibana:7.17.23
+  #   volumes:
+  #     - ./config/kibana/:/usr/share/kibana/config/
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
+  #   command: >
+  #     sh -c "/usr/share/kibana/config/setup.sh"
 
