@@ -10,15 +10,15 @@ variables:
   - group: 'medfast-global-vars'
 
 stages:
-  - stage: InfrastructureSetup
+  - stage: Deploy
     jobs:
-      - job: Build
-        displayName: 'Build'
+      - job: DeployAKS
         steps:
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
           inputs:
             terraformVersion: '1.10.0' 
+
         - task: TerraformTaskV4@4
           displayName: 'Terraform Init'
           inputs:
@@ -30,16 +30,50 @@ stages:
             backendAzureRmContainerName: $(storage_container_name)
             backendAzureRmKey: $(tf_state_file)
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
         - task: TerraformTaskV4@4
           displayName: 'Terraform Validate'
           inputs:
             provider: 'azurerm'
             command: 'validate'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
         - task: TerraformTaskV4@4
-          displayName: 'Terraform Format'
+          displayName: 'Terraform Plan'
           inputs:
-            command: 'fmt'
+            provider: 'azurerm'
+            command: 'plan -out=tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
-        
+
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Apply'
+          inputs:
+            provider: 'azurerm'
+            command: 'apply -auto-approve tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
+      # - deployment: DeployToAKS
+      #   strategy:
+      #     runOnce:
+      #       deploy:
+      #         steps:
+      #           - task: HelmInstaller@1
+      #             displayName: Install Helm
+      #             inputs: 
+      #               helmVersionToInstall: ${{ parameters.helmVersion }}
+
+      #           - task: HelmDeploy@1
+      #             inputs:
+      #               connectionType: 'Azure Resource Manager'
+      #               azureSubscription: "demo-conn"
+      #               azureResourceGroup: $(resourceGroup)
+      #               kubernetesCluster: $(clusterName)
+      #               command: 'upgrade'
+      #               chartType: FilePath
+      #               chartPath: '$(System.DefaultWorkingDirectory)/helm-apache'
+      #               releaseName: $(helmReleaseName)
+      #               install: true
+      #               arguments: "--atomic --force --timeout 10m0s --wait"
+      #             displayName: 'Deploy Helm Chart'
+       
 
