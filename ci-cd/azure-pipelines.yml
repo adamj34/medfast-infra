@@ -39,7 +39,6 @@ stages:
         - task: TerraformTaskV4@4
           displayName: 'Terraform Format'
           inputs:
-            provider: 'azurerm'
             command: 'fmt'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
         

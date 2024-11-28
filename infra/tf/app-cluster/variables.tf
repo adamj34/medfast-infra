@@ -28,12 +28,12 @@ variable "aks_node_number" {
 
 variable "k8s_version" {
   type        = string
-  description = "Kubernetes version"  
+  description = "Kubernetes version"
 }
 
 variable "node_pool_name" {
   type        = string
-  description = "Name of the node pool"  
+  description = "Name of the node pool"
 }
 
 # Container Registry
