@@ -1,19 +1,48 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: $(agent_pool_name)"
+    demands:
+    - agent.name -equals medfast-machine
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables: 
+  - group: 'medfast-global-vars'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: InfrastructureSetup
+    jobs:
+      - job: Build
+        displayName: 'Build'
+        steps:
+        - task: TerraformInstaller@1
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: '1.10.0' 
+        - task: TerraformTaskV4@4
+            displayName: 'Terraform Init'
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: $(service_connection)
+              backendAzureRmResourceGroupName: $(resource_group_name)
+              backendAzureRmStorageAccountName: $(storage_account_name)
+              backendAzureRmContainerName: $(storage_container_name)
+              backendAzureRmKey: $(tf_state_file)
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Validate'
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Format'
+          inputs:
+            provider: 'azurerm'
+            command: 'fmt'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        
+
