@@ -115,3 +115,11 @@ resource "azurerm_storage_container" "tfstate" {
   storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
 }
+
+# Create a container registry
+resource "azurerm_container_registry" "current" {
+  name                = var.container_registry_name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  sku                 = "Standard"
+}

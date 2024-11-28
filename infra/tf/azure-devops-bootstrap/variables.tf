@@ -1,7 +1,6 @@
 variable "app_name" {
   type        = string
   description = "Name of the application"
-
 }
 
 variable "resource_group_name" {
@@ -20,3 +19,8 @@ variable "vm_username" {
   default     = "azureadmin"
 }
 
+# Container Registry
+variable "container_registry_name" {
+  type        = string
+  description = "Name of the container registry"
+}
