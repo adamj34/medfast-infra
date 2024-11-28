@@ -1,7 +1,6 @@
 data "azurerm_container_registry" "current" {
   name                = var.container_registry_name
   resource_group_name = var.resource_group_name
-  location            = var.location
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
@@ -27,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "default" {
 resource "azurerm_role_assignment" "current" {
   principal_id                     = azurerm_kubernetes_cluster.default.kubelet_identity[0].object_id
   role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.current.id
+  scope                            = data.azurerm_container_registry.current.id
   skip_service_principal_aad_check = true
 }
 
