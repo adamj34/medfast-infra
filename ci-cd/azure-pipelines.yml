@@ -6,7 +6,7 @@ trigger:
 pool:
   name: $(agent_pool_name)"
     demands:
-    - agent.name -equals medfast-machine
+      - agent.name -equals medfast-machine
 
 variables: 
   - group: 'medfast-global-vars'
