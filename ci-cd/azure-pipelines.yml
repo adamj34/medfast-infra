@@ -121,5 +121,5 @@ stages:
                     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
                     releaseName: $(helm_release_name)
                     install: true
-                    arguments: "--atomic --force"
+                    arguments: "--atomic --force --cleanup-on-fail"
     
