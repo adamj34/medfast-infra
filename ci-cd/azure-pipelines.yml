@@ -99,6 +99,11 @@ stages:
           runOnce:
             deploy:
               steps:
+                - task: KubectlInstaller@0
+                  displayName: Install Kubectl
+                  inputs:
+                    kubectlVersion: 'latest'
+
                 - task: HelmInstaller@1
                   displayName: Install Helm
                   inputs: 
