@@ -40,7 +40,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'init'
-            backendServiceArm: $(service_connection)
+            backendServiceArm: "medfast-devops-conn"
             backendAzureRmResourceGroupName: $(resource_group_name)
             backendAzureRmStorageAccountName: $(storage_account_name)
             backendAzureRmContainerName: $(storage_container_name)
