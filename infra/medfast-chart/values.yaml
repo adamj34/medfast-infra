@@ -1,0 +1,33 @@
+# values.yaml
+frontend:
+  name: medfast-frontend
+  replicaCount: 1
+  image:
+    repository: medfast-frontend
+    tag: latest
+    pullPolicy: Never
+  service:
+    port: 80
+    targetPort: 80
+
+backend:
+  name: medfast-backend
+  replicaCount: 1
+  image:
+    repository: medfast-backend
+    tag: latest
+    pullPolicy: Never
+  service:
+    port: 8080
+    targetPort: 8080
+  config:
+    serverPort: "8080"
+    datasourceUrl: "jdbc:postgresql://postgres:5432/medfast"
+    datasourceUsername: "user"
+    datasourcePassword: "secret"
+    mailPassword: "pyne podv rskn cqof"
+    activeProfile: "prod"
+
+ingress:
+  className: nginx
+  enabled: true
