@@ -80,7 +80,7 @@ stages:
           - task: HelmDeploy@1
             inputs:
               connectionType: 'Azure Resource Manager'
-              azureSubscription: $(service_connection)
+              azureSubscription: "medfast-devops-conn"
               azureResourceGroup: $(resource_group_name)
               kubernetesCluster: $(cluster_name)
               command: 'upgrade'
