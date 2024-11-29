@@ -102,6 +102,7 @@ stages:
           #     arguments: "--atomic --force --timeout 10m0s --wait"
 
       - deployment: DeployApp
+        dependsOn: DeployAKS
         environment: medfast-dev
         strategy:
           runOnce:
