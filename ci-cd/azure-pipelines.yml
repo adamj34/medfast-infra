@@ -38,7 +38,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'init'
-            backendServiceArm: "medfast-devops-conn"
+            backendServiceArm: $(service_connection)
             backendAzureRmResourceGroupName: $(resource_group_name)
             backendAzureRmStorageAccountName: $(storage_account_name)
             backendAzureRmContainerName: $(storage_container_name)
@@ -49,6 +49,7 @@ stages:
           displayName: 'Terraform Validate'
           inputs:
             provider: 'azurerm'
+            environmentServiceNameAzureRM: $(service_connection)
             command: 'validate'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
@@ -56,6 +57,7 @@ stages:
           displayName: 'Terraform Plan'
           inputs:
             provider: 'azurerm'
+            
             command: 'plan'
             commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
@@ -64,11 +66,13 @@ stages:
           displayName: 'Terraform Apply'
           inputs:
             provider: 'azurerm'
+            environmentServiceNameAzureRM: $(service_connection)
             command: 'apply'
             commandOptions: '-auto-approve main.tfplan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
       - job: DeployApp
+        dependsOn: DeployAKS
         steps:
           - task: HelmInstaller@1
             displayName: Install Helm
@@ -78,7 +82,7 @@ stages:
           - task: HelmDeploy@1
             inputs:
               connectionType: 'Azure Resource Manager'
-              azureSubscription: "medfast-devops-conn"
+              azureSubscription: $(service_connection)
               azureResourceGroup: $(resource_group_name)
               kubernetesCluster: $(cluster_name)
               command: 'upgrade'
