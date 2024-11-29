@@ -16,7 +16,7 @@ parameters:
     default: dev
 
 variables: 
-  - group: 'medfast-global-vars'
+  group: 'medfast-global-vars'
 
   # Environment-specific variables
   ${{ if eq(parameters.environ, 'dev') }}:
