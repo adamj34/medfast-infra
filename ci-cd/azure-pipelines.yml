@@ -63,6 +63,7 @@ stages:
 
         - task: TerraformTaskV4@4
           displayName: 'Terraform Apply'
+          condition: eq(variables['terraformPlan.changesPresent'], 'true')  # Only run if there are changes
           inputs:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(service_connection)
@@ -79,6 +80,7 @@ stages:
               helmVersionToInstall: '3.16.3'
 
           - task: HelmDeploy@1
+            displayName: Deploy Helm Chart
             inputs:
               connectionType: 'Azure Resource Manager'
               azureSubscription: $(service_connection)
@@ -90,5 +92,4 @@ stages:
               releaseName: $(helm_release_name)
               install: true
               arguments: "--atomic --force --timeout 10m0s --wait"
-            displayName: 'Deploy Helm Chart'
   
