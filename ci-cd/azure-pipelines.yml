@@ -72,7 +72,7 @@ stages:
 
         - task: TerraformTaskV4@4
           displayName: 'Terraform Apply'
-          condition: eq(variables['terraformPlan.changesPresent'], 'true')  # Only run if there are changes
+          # condition: eq(variables['terraformPlan.changesPresent'], 'true')  # Only run if there are changes
           inputs:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(service_connection)
