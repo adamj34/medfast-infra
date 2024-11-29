@@ -46,6 +46,14 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
+          displayName: 'Terraform Destroy'
+          inputs:
+            provider: 'azurerm'
+            command: 'destroy'
+            commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
+        - task: TerraformTaskV4@4
           displayName: 'Terraform Validate'
           inputs:
             provider: 'azurerm'
