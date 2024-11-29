@@ -49,7 +49,6 @@ stages:
           displayName: 'Terraform Validate'
           inputs:
             provider: 'azurerm'
-            environmentServiceNameAzureRM: $(service_connection)
             command: 'validate'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
@@ -57,7 +56,7 @@ stages:
           displayName: 'Terraform Plan'
           inputs:
             provider: 'azurerm'
-            
+            environmentServiceNameAzureRM: $(service_connection)
             command: 'plan'
             commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
