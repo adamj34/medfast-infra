@@ -15,15 +15,13 @@ parameters:
       - dev
     default: dev
 
-variables: 
-  group: 'medfast-global-vars'
-
-  # Environment-specific variables
-  ${{ if eq(parameters.environ, 'dev') }}:
-    resource_group_name: 'medfast-rg-dev'
-  ${{ if eq(parameters.environ, 'prod') }}:
-    resource_group_name: 'medfast-rg-prod'
-  
+variables:
+  - group: 'medfast-global-vars'  # Now part of a list
+  - name: resource_group_name  # Inline variables need explicit names
+    ${{ if eq(parameters.environ, 'dev') }}:
+      value: 'medfast-rg-dev'
+    ${{ if eq(parameters.environ, 'prod') }}:
+      value: 'medfast-rg-prod'
 
 stages:
   - stage: Deploy
