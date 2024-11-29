@@ -71,25 +71,50 @@ stages:
             commandOptions: '-auto-approve main.tfplan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      - job: DeployApp
-        dependsOn: DeployAKS
-        steps:
-          - task: HelmInstaller@1
-            displayName: Install Helm
-            inputs: 
-              helmVersionToInstall: '3.16.3'
+      # - job: DeployApp
+      #   dependsOn: DeployAKS
+      #   steps:
+      #     - task: HelmInstaller@1
+      #       displayName: Install Helm
+      #       inputs: 
+      #         helmVersionToInstall: '3.16.3'
 
-          - task: HelmDeploy@1
-            displayName: Deploy Helm Chart
-            inputs:
-              connectionType: 'Azure Resource Manager'
-              azureSubscription: $(service_connection)
-              azureResourceGroup: $(resource_group_name)
-              kubernetesCluster: $(cluster_name)
-              command: 'upgrade'
-              chartType: FilePath
-              chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
-              releaseName: $(helm_release_name)
-              install: true
-              arguments: "--atomic --force --timeout 10m0s --wait"
-  
+          # - task: HelmDeploy@1
+          #   displayName: Deploy Helm Chart
+          #   inputs:
+          #     connectionType: 'Azure Resource Manager'
+          #     azureSubscription: $(service_connection)
+          #     azureResourceGroup: $(resource_group_name)
+          #     kubernetesCluster: $(cluster_name)
+          #     command: 'upgrade'
+          #     chartType: FilePath
+          #     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
+          #     releaseName: $(helm_release_name)
+          #     install: true
+          #     arguments: "--atomic --force --timeout 10m0s --wait"
+
+      - deployment: DeployToAKS
+        environment: medfast-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: HelmInstaller@1
+                  displayName: Install Helm
+                  inputs: 
+                    helmVersionToInstall: '3.16.3'
+
+                - task: HelmDeploy@1
+                  displayName: Deploy Helm Chart
+                  inputs:
+                    connectionType: 'Azure Resource Manager'
+                    azureSubscription: $(service_connection)
+                    azureResourceGroup: $(resource_group_name)
+                    kubernetesCluster: $(cluster_name)
+                    command: 'upgrade'
+                    chartType: FilePath
+                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
+                    releaseName: $(helm_release_name)
+                    install: true
+                    arguments: "--atomic --force --timeout 10m0s --wait"
+    
