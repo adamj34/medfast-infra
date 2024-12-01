@@ -5,7 +5,7 @@ frontend:
   image:
     repository: medfast-frontend
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   service:
     port: 80
     targetPort: 80
@@ -16,13 +16,13 @@ backend:
   image:
     repository: medfast-backend
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   service:
     port: 8080
     targetPort: 8080
   config:
     serverPort: "8080"
-    datasourceUrl: "jdbc:postgresql://postgres:5432/medfast"
+    datasourceUrl: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
     datasourceUsername: "user"
     datasourcePassword: "secret"
     mailPassword: "pyne podv rskn cqof"

@@ -16,14 +16,50 @@ parameters:
     default: dev
 
 variables:
-  - group: 'medfast-global-vars'  # Now part of a list
-  - name: resource_group_name  # Inline variables need explicit names
+  - group: 'medfast-global-vars'
+  - name: resource_group_name  
     ${{ if eq(parameters.environ, 'dev') }}:
       value: 'medfast-rg-dev'
     ${{ if eq(parameters.environ, 'prod') }}:
       value: 'medfast-rg-prod'
+  - name: tag
+    value: $(Build.BuildId)
 
 stages:
+  - stage: Build
+    jobs:
+      - job: BuildFrontend
+        steps:
+        - task: DockerInstaller@0
+          inputs:
+            dockerVersion: '17.09.0-ce'
+
+        - task: Docker@2
+          displayName: Build and publish frontend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(service_connection)
+            repository: 'medfast-frontend'
+            dockerfile: 'medfast-fe/Dockerfile'
+            tags: |
+              $(tag)
+
+      - job: BuildBackend
+        steps:
+        - task: DockerInstaller@0
+          inputs:
+            dockerVersion: '17.09.0-ce'
+
+        - task: Docker@2
+          displayName: Build and publish backend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(service_connection)
+            repository: 'medfast-backend'
+            dockerfile: 'medfast-be/Dockerfile'
+            tags: |
+              $(tag)
+
   - stage: Deploy
     jobs:
       - job: DeployAKS
@@ -45,34 +81,33 @@ stages:
             backendAzureRmKey: $(tf_state_file)
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-        - task: TerraformTaskV4@4
-          displayName: 'Terraform Destroy'
-          inputs:
-            provider: 'azurerm'
-            environmentServiceNameAzureRM: $(service_connection)
-            command: 'destroy'
-            commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
-
         # - task: TerraformTaskV4@4
-        #   displayName: 'Terraform Validate'
-        #   inputs:
-        #     provider: 'azurerm'
-        #     command: 'validate'
-        #     workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
-
-        # - task: TerraformTaskV4@4
-        #   displayName: 'Terraform Plan'
+        #   displayName: 'Terraform Destroy'
         #   inputs:
         #     provider: 'azurerm'
         #     environmentServiceNameAzureRM: $(service_connection)
-        #     command: 'plan'
-        #     commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+        #     command: 'destroy'
+        #     commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
         #     workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
+          displayName: 'Terraform Validate'
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Plan'
+          inputs:
+            provider: 'azurerm'
+            environmentServiceNameAzureRM: $(service_connection)
+            command: 'plan'
+            commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+
+        - task: TerraformTaskV4@4
           displayName: 'Terraform Apply'
-          # condition: eq(variables['terraformPlan.changesPresent'], 'true')  # Only run if there are changes
           inputs:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(service_connection)

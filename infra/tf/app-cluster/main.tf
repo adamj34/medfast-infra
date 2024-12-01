@@ -51,3 +51,43 @@ resource "helm_release" "nginx_ingress" {
   # Depends on the AKS cluster being ready
   depends_on = [azurerm_kubernetes_cluster.default]
 }
+
+
+resource "azurerm_postgresql_server" "current" {
+  name                = "postgres-${var.app_name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  sku_name = "B_Gen4_1"
+
+  storage_mb                   = 5120
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = false
+  auto_grow_enabled            = false
+
+  administrator_login          = "user"
+  administrator_login_password = "secret"
+  version                      = "11"
+  ssl_enforcement_enabled      = false
+}
+
+resource "azurerm_postgresql_database" "current" {
+  name                = "medfast"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.current.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
+
+  # prevent the possibility of accidental data loss
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "azurerm_postgresql_firewall_rule" "aks" {
+  name                = "aks-nodes"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.current.name
+  start_ip_address    = azurerm_kubernetes_cluster.default.network_profile[0].service_cidr
+  end_ip_address      = azurerm_kubernetes_cluster.default.network_profile[0].service_cidr
+}
