@@ -69,6 +69,7 @@ resource "azurerm_postgresql_server" "current" {
   administrator_login_password = "secret"
   version                      = "11"
   ssl_enforcement_enabled      = false
+  ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
 }
 
 resource "azurerm_postgresql_database" "current" {
