@@ -140,7 +140,7 @@ resource "azurerm_kubernetes_cluster" "default" {
 
 # Assign AcrPull role to AKS cluster
 resource "azurerm_role_assignment" "current" {
-  principal_id                     = azurerm_kubernetes_cluster.default.kubelet_identity.object_id
+  principal_id                     = azurerm_kubernetes_cluster.default.kubelet_identity[0].object_id
   role_definition_name             = "AcrPull"
   scope                            = data.azurerm_container_registry.current.id
   skip_service_principal_aad_check = true
@@ -175,7 +175,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   administrator_login    = "user"
   administrator_password = "secret123!"
   version                = "13"
-  sku_name               = "B1ms"
+  sku_name               = "B_Standard_B1ms"
   storage_mb             = 32768
 
   delegated_subnet_id = azurerm_subnet.postgres_subnet.id
