@@ -172,10 +172,10 @@ resource "azurerm_postgresql_flexible_server" "example" {
   name                   = "example-psql-flexibleserver"
   resource_group_name    = var.resource_group_name
   location               = var.location
-  administrator_login    = "psqladmin"
-  administrator_password = "P@ssw0rd1234!"
+  administrator_login    = "user"
+  administrator_password = "secret123!"
   version                = "13"
-  sku_name               = "Standard_D4s_v3"
+  sku_name               = "B1ms"
   storage_mb             = 32768
 
   delegated_subnet_id = azurerm_subnet.postgres_subnet.id
