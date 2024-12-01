@@ -93,6 +93,10 @@ resource "azurerm_linux_virtual_machine" "current" {
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 # Create a storage account

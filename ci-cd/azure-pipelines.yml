@@ -32,17 +32,8 @@ stages:
         steps:
         - script: |
             # Install Docker
-            sudo apt update && sudo apt install docker.io -y
-            
-            # Fix permissions and restart
-            sudo chmod 666 /var/run/docker.sock
-            sudo systemctl restart docker
-            
-            # Add user to docker group and refresh permissions
-            sudo usermod -aG docker $USER
-            sudo chmod 666 /var/run/docker.sock
-            newgrp docker
-
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
           displayName: 'Setup Docker'
 
         - task: Docker@2
