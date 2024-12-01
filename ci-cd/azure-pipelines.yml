@@ -26,63 +26,64 @@ variables:
     value: $(Build.BuildId)
 
 stages:
-  # - stage: Build
-  #   jobs:
-  #     - job: BuildFrontend
-  #       steps:
-  #       - script: |
-  #           # Install Docker
-  #           curl -fsSL https://get.docker.com -o get-docker.sh
-  #           sudo sh get-docker.sh
+  - stage: Build
+    jobs:
+      - job: BuildFrontend
+        steps:
+        - script: |
+            # Install Docker
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
 
-  #           sudo systemctl start docker
-  #           sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo systemctl enable docker
 
-  #           sudo chmod 666 /var/run/docker.sock
-  #           sudo usermod -aG docker $USER
+            sudo chmod 666 /var/run/docker.sock
+            sudo usermod -aG docker $USER
 
-  #           # Verify Docker is running
-  #           sudo docker ps || (echo "Docker daemon not running" && exit 1)
-  #         displayName: 'Setup Docker'
+            # Verify Docker is running
+            sudo docker ps || (echo "Docker daemon not running" && exit 1)
+          displayName: 'Setup Docker'
 
-  #       - task: Docker@2
-  #         displayName: Build and publish frontend image to Azure Container Registry
-  #         inputs:
-  #           command: buildAndPush
-  #           containerRegistry: $(docker_acr_service_connection)
-  #           repository: 'medfast-frontend'
-  #           dockerfile: 'medfast-fe/Dockerfile'
-  #           tags: |
-  #             $(tag)
+        - task: Docker@2
+          displayName: Build and publish frontend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(docker_acr_service_connection)
+            repository: 'medfast-frontend'
+            dockerfile: 'medfast-fe/Dockerfile'
+            tags: |
+              $(tag)
 
-  #     - job: BuildBackend
-  #       steps:
-  #       - script: |
-  #           # Install Docker
-  #           curl -fsSL https://get.docker.com -o get-docker.sh
-  #           sudo sh get-docker.sh
+      - job: BuildBackend
+        steps:
+        - script: |
+            # Install Docker
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
 
-  #           sudo systemctl start docker
-  #           sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo systemctl enable docker
             
-  #           sudo chmod 666 /var/run/docker.sock
-  #           sudo usermod -aG docker $USER
+            sudo chmod 666 /var/run/docker.sock
+            sudo usermod -aG docker $USER
 
-  #           # Verify Docker is running
-  #           sudo docker ps || (echo "Docker daemon not running" && exit 1)
-  #         displayName: 'Setup Docker'
+            # Verify Docker is running
+            sudo docker ps || (echo "Docker daemon not running" && exit 1)
+          displayName: 'Setup Docker'
 
-  #       - task: Docker@2
-  #         displayName: Build and publish backend image to Azure Container Registry
-  #         inputs:
-  #           command: buildAndPush
-  #           containerRegistry: $(docker_acr_service_connection)
-  #           repository: 'medfast-backend'
-  #           dockerfile: 'medfast-be/Dockerfile'
-  #           tags: |
-  #             $(tag)
+        - task: Docker@2
+          displayName: Build and publish backend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(docker_acr_service_connection)
+            repository: 'medfast-backend'
+            dockerfile: 'medfast-be/Dockerfile'
+            tags: |
+              $(tag)
 
   - stage: Deploy
+    dependsOn: Build
     jobs:
       - job: DeployAKS
         steps:
@@ -112,59 +113,59 @@ stages:
             commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Validate'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       command: 'validate'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Validate'
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Plan'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       environmentServiceNameAzureRM: $(arm_service_connection)
-      #       command: 'plan'
-      #       commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Plan'
+          inputs:
+            provider: 'azurerm'
+            environmentServiceNameAzureRM: $(arm_service_connection)
+            command: 'plan'
+            commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Apply'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       environmentServiceNameAzureRM: $(arm_service_connection)
-      #       command: 'apply'
-      #       commandOptions: '-auto-approve main.tfplan'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Apply'
+          inputs:
+            provider: 'azurerm'
+            environmentServiceNameAzureRM: $(arm_service_connection)
+            command: 'apply'
+            commandOptions: '-auto-approve main.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      # - deployment: DeployApp
-      #   dependsOn: DeployAKS
-      #   environment: medfast-dev
-      #   strategy:
-      #     runOnce:
-      #       deploy:
-      #         steps:
-      #           - task: KubectlInstaller@0
-      #             displayName: Install Kubectl
-      #             inputs:
-      #               kubectlVersion: 'latest'
+      - deployment: DeployApp
+        dependsOn: DeployAKS
+        environment: medfast-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubectlInstaller@0
+                  displayName: Install Kubectl
+                  inputs:
+                    kubectlVersion: 'latest'
 
-      #           - task: HelmInstaller@1
-      #             displayName: Install Helm
-      #             inputs: 
-      #               helmVersionToInstall: '3.16.3'
+                - task: HelmInstaller@1
+                  displayName: Install Helm
+                  inputs: 
+                    helmVersionToInstall: '3.16.3'
 
-      #           - task: HelmDeploy@1
-      #             displayName: Deploy Helm Chart
-      #             inputs:
-      #               connectionType: 'Azure Resource Manager'
-      #               azureSubscription: $(arm_service_connection)
-      #               azureResourceGroup: $(resource_group_name)
-      #               kubernetesCluster: $(cluster_name)
-      #               command: 'upgrade'
-      #               chartType: FilePath
-      #               chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
-      #               releaseName: $(helm_release_name)
-      #               install: true
-      #               arguments: "--atomic --force --cleanup-on-fail --debug"
+                - task: HelmDeploy@1
+                  displayName: Deploy Helm Chart
+                  inputs:
+                    connectionType: 'Azure Resource Manager'
+                    azureSubscription: $(arm_service_connection)
+                    azureResourceGroup: $(resource_group_name)
+                    kubernetesCluster: $(cluster_name)
+                    command: 'upgrade'
+                    chartType: FilePath
+                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
+                    releaseName: $(helm_release_name)
+                    install: true
+                    arguments: "--atomic --force --cleanup-on-fail --debug"
     

@@ -85,10 +85,10 @@ resource "azurerm_postgresql_database" "current" {
   }
 }
 
-# resource "azurerm_postgresql_firewall_rule" "aks" {
-#   name                = "aks-nodes"
-#   resource_group_name = var.resource_group_name
-#   server_name         = azurerm_postgresql_server.current.name
-#   start_ip_address    = azurerm_kubernetes_cluster.default.network_profile[0].service_cidr
-#   end_ip_address      = azurerm_kubernetes_cluster.default.network_profile[0].service_cidr
-# }
+resource "azurerm_postgresql_firewall_rule" "aks" {
+  name                = "aks-nodes"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.current.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
