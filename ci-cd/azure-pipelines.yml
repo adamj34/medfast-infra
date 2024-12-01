@@ -139,7 +139,7 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
       - deployment: DeployApp
-        dependsOn: DeployAKS
+        # dependsOn: DeployAKS
         environment: medfast-dev
         strategy:
           runOnce:
