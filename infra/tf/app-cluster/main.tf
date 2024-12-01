@@ -59,7 +59,7 @@ data "azurerm_container_registry" "current" {
 }
 
 # Resource Group
-resource "azurerm_resource_group" "example" {
+data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
   location = var.location
 }
