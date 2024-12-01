@@ -58,7 +58,7 @@ resource "azurerm_postgresql_server" "current" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  sku_name = "B_Gen4_1"
+  sku_name = "B_Gen5_1"
 
   storage_mb                   = 5120
   backup_retention_days        = 7
