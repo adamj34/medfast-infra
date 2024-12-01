@@ -38,7 +38,7 @@ stages:
           displayName: Build and publish frontend image to Azure Container Registry
           inputs:
             command: buildAndPush
-            containerRegistry: $(service_connection)
+            containerRegistry: $(docker_acr_service_connection)
             repository: 'medfast-frontend'
             dockerfile: 'medfast-fe/Dockerfile'
             tags: |
@@ -54,7 +54,7 @@ stages:
           displayName: Build and publish backend image to Azure Container Registry
           inputs:
             command: buildAndPush
-            containerRegistry: $(service_connection)
+            containerRegistry: $(docker_acr_service_connection)
             repository: 'medfast-backend'
             dockerfile: 'medfast-be/Dockerfile'
             tags: |
@@ -74,7 +74,7 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'init'
-            backendServiceArm: $(service_connection)
+            backendServiceArm: $(arm_service_connection)
             backendAzureRmResourceGroupName: $(resource_group_name)
             backendAzureRmStorageAccountName: $(storage_account_name)
             backendAzureRmContainerName: $(storage_container_name)
@@ -85,7 +85,7 @@ stages:
         #   displayName: 'Terraform Destroy'
         #   inputs:
         #     provider: 'azurerm'
-        #     environmentServiceNameAzureRM: $(service_connection)
+        #     environmentServiceNameAzureRM: $(arm_service_connection)
         #     command: 'destroy'
         #     commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
         #     workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
@@ -101,7 +101,7 @@ stages:
           displayName: 'Terraform Plan'
           inputs:
             provider: 'azurerm'
-            environmentServiceNameAzureRM: $(service_connection)
+            environmentServiceNameAzureRM: $(arm_service_connection)
             command: 'plan'
             commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
@@ -110,7 +110,7 @@ stages:
           displayName: 'Terraform Apply'
           inputs:
             provider: 'azurerm'
-            environmentServiceNameAzureRM: $(service_connection)
+            environmentServiceNameAzureRM: $(arm_service_connection)
             command: 'apply'
             commandOptions: '-auto-approve main.tfplan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
@@ -136,7 +136,7 @@ stages:
                   displayName: Deploy Helm Chart
                   inputs:
                     connectionType: 'Azure Resource Manager'
-                    azureSubscription: $(service_connection)
+                    azureSubscription: $(arm_service_connection)
                     azureResourceGroup: $(resource_group_name)
                     kubernetesCluster: $(cluster_name)
                     command: 'upgrade'
