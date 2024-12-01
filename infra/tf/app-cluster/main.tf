@@ -52,7 +52,7 @@ resource "helm_release" "nginx_ingress" {
   depends_on = [azurerm_kubernetes_cluster.default]
 }
 
-
+# Postgres
 resource "azurerm_postgresql_server" "current" {
   name                = "postgres-${var.app_name}"
   location            = var.location
@@ -68,9 +68,8 @@ resource "azurerm_postgresql_server" "current" {
   administrator_login              = "user"
   administrator_login_password     = "secret123!"
   version                          = "11"
-  ssl_enforcement_enabled          = false
-  ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
-  public_network_access_enabled    = true
+  ssl_enforcement_enabled          = true
+  public_network_access_enabled    = false
 }
 
 resource "azurerm_postgresql_database" "current" {
@@ -86,26 +85,3 @@ resource "azurerm_postgresql_database" "current" {
   }
 }
 
-# Get AKS cluster outbound IPs
-data "azurerm_kubernetes_cluster" "current" {
-  name                = azurerm_kubernetes_cluster.default.name
-  resource_group_name = var.resource_group_name
-}
-
-# Create firewall rule to allow AKS nodes
-resource "azurerm_postgresql_firewall_rule" "aks_nodes" {
-  name                = "aks-nodes"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_server.current.name
-  start_ip_address    = element(tolist(data.azurerm_kubernetes_cluster.current.network_profile[0].outbound_ip_addresses), 0)
-  end_ip_address      = element(tolist(data.azurerm_kubernetes_cluster.current.network_profile[0].outbound_ip_addresses), 0)
-}
-
-# Allow Azure services to access PostgreSQL
-resource "azurerm_postgresql_firewall_rule" "azure_services" {
-  name                = "allow-azure-services"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_server.current.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "0.0.0.0"
-}
