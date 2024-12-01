@@ -66,7 +66,7 @@ resource "azurerm_postgresql_server" "current" {
   auto_grow_enabled            = false
 
   administrator_login          = "user"
-  administrator_login_password = "secret"
+  administrator_login_password = "secret123!"
   version                      = "11"
   ssl_enforcement_enabled      = false
   ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
