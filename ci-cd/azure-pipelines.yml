@@ -26,47 +26,47 @@ variables:
     value: $(Build.BuildId)
 
 stages:
-  - stage: Build
-    jobs:
-      - job: BuildAndPushImages
-        steps:
-        - script: |
-            # Install Docker
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
+  # - stage: Build
+  #   jobs:
+  #     - job: BuildAndPushImages
+  #       steps:
+  #       - script: |
+  #           # Install Docker
+  #           curl -fsSL https://get.docker.com -o get-docker.sh
+  #           sudo sh get-docker.sh
 
-            sudo systemctl start docker
-            sudo systemctl enable docker
+  #           sudo systemctl start docker
+  #           sudo systemctl enable docker
 
-            sudo chmod 666 /var/run/docker.sock
-            sudo usermod -aG docker $USER
+  #           sudo chmod 666 /var/run/docker.sock
+  #           sudo usermod -aG docker $USER
 
-            # Verify Docker is running
-            sudo docker ps || (echo "Docker daemon not running" && exit 1)
-          displayName: 'Setup Docker'
+  #           # Verify Docker is running
+  #           sudo docker ps || (echo "Docker daemon not running" && exit 1)
+  #         displayName: 'Setup Docker'
 
-        - task: Docker@2
-          displayName: Build and publish frontend image to Azure Container Registry
-          inputs:
-            command: buildAndPush
-            containerRegistry: $(docker_acr_service_connection)
-            repository: 'medfast-frontend'
-            dockerfile: 'medfast-fe/Dockerfile'
-            tags: |
-              $(tag)
+  #       - task: Docker@2
+  #         displayName: Build and publish frontend image to Azure Container Registry
+  #         inputs:
+  #           command: buildAndPush
+  #           containerRegistry: $(docker_acr_service_connection)
+  #           repository: 'medfast-frontend'
+  #           dockerfile: 'medfast-fe/Dockerfile'
+  #           tags: |
+  #             $(tag)
 
-        - task: Docker@2
-          displayName: Build and publish backend image to Azure Container Registry
-          inputs:
-            command: buildAndPush
-            containerRegistry: $(docker_acr_service_connection)
-            repository: 'medfast-backend'
-            dockerfile: 'medfast-be/Dockerfile'
-            tags: |
-              $(tag)
+  #       - task: Docker@2
+  #         displayName: Build and publish backend image to Azure Container Registry
+  #         inputs:
+  #           command: buildAndPush
+  #           containerRegistry: $(docker_acr_service_connection)
+  #           repository: 'medfast-backend'
+  #           dockerfile: 'medfast-be/Dockerfile'
+  #           tags: |
+  #             $(tag)
 
   - stage: Deploy
-    dependsOn: Build
+    # dependsOn: Build
     jobs:
       - job: DeployAKS
         steps:

@@ -85,3 +85,27 @@ resource "azurerm_postgresql_database" "current" {
     prevent_destroy = false
   }
 }
+
+# Get the AKS outbound IPs to whitelist them in PostgreSQL firewall rules
+data "azurerm_kubernetes_cluster" "ip_addresses" {
+  name                = azurerm_kubernetes_cluster.default.name
+  resource_group_name = var.resource_group_name
+}
+
+# Create firewall rule to allow AKS nodes
+resource "azurerm_postgresql_firewall_rule" "aks_nodes" {
+  name                = "aks-nodes"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.current.name
+  start_ip_address    = data.azurerm_kubernetes_cluster.ip_addresses.network_profile[0].load_balancer_profile[0].effective_outbound_ips[0]
+  end_ip_address      = data.azurerm_kubernetes_cluster.ip_addresses.network_profile[0].load_balancer_profile[0].effective_outbound_ips[0]
+}
+
+# Allow Azure services to access PostgreSQL
+resource "azurerm_postgresql_firewall_rule" "azure_services" {
+  name                = "allow-azure-services"
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_postgresql_server.current.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
