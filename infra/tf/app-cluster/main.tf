@@ -65,11 +65,12 @@ resource "azurerm_postgresql_server" "current" {
   geo_redundant_backup_enabled = false
   auto_grow_enabled            = false
 
-  administrator_login          = "user"
-  administrator_login_password = "secret123!"
-  version                      = "11"
-  ssl_enforcement_enabled      = false
+  administrator_login              = "user"
+  administrator_login_password     = "secret123!"
+  version                          = "11"
+  ssl_enforcement_enabled          = false
   ssl_minimal_tls_version_enforced = "TLSEnforcementDisabled"
+  public_network_access_enabled    = true
 }
 
 resource "azurerm_postgresql_database" "current" {
@@ -83,12 +84,4 @@ resource "azurerm_postgresql_database" "current" {
   lifecycle {
     prevent_destroy = false
   }
-}
-
-resource "azurerm_postgresql_firewall_rule" "aks" {
-  name                = "aks-nodes"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_server.current.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "0.0.0.0"
 }
