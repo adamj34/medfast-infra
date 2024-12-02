@@ -1,6 +1,6 @@
 # shared 
 app_name = "medfast"
-resource_group_name = "medfast-rg-dev"
+resource_group_name = "medfast-rg-app-dev"
 location = "northeurope"
 
 # k8s

@@ -187,7 +187,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "example" {
-  name      = "exampledb"
+  name      = "medfast"
   server_id = azurerm_postgresql_flexible_server.example.id
   collation = "en_US.utf8"
   charset   = "utf8"
