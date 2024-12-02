@@ -52,16 +52,15 @@
 #   depends_on = [azurerm_kubernetes_cluster.default]
 # }
 
+# Resource Group
+data "azurerm_resource_group" "example" {
+  name     = var.resource_group_name
+}
+
 # Data source for Container Registry
 data "azurerm_container_registry" "current" {
   name                = var.container_registry_name
   resource_group_name = var.resource_group_name
-}
-
-# Resource Group
-resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
-  location = var.location
 }
 
 # Virtual Network
@@ -69,7 +68,7 @@ resource "azurerm_virtual_network" "example" {
   name                = "example-vn"
   location            = var.location
   resource_group_name = var.resource_group_name
-  address_space       = ["10.0.0.0/16"]
+  address_space       = ["10.1.0.0/16"]
 }
 
 # Subnet for AKS
@@ -77,7 +76,7 @@ resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = ["10.1.1.0/24"]
 }
 
 # Subnet for PostgreSQL
@@ -85,7 +84,7 @@ resource "azurerm_subnet" "postgres_subnet" {
   name                 = "postgres-subnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = ["10.1.2.0/24"]
 
   delegation {
     name = "psql-delegation"
@@ -180,6 +179,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
 
   delegated_subnet_id = azurerm_subnet.postgres_subnet.id
   private_dns_zone_id = azurerm_private_dns_zone.postgres_dns_zone.id
+  public_network_access_enabled = false
 
   depends_on = [
     azurerm_subnet.postgres_subnet,
