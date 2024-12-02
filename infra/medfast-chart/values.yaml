@@ -4,7 +4,7 @@ frontend:
   replicaCount: 1
   image:
     repository: medfastcr.azurecr.io/medfast-frontend
-    tag: latest
+    tag: 58
     pullPolicy: Always
   service:
     port: 80
@@ -15,7 +15,7 @@ backend:
   replicaCount: 1
   image:
     repository: medfastcr.azurecr.io/medfast-backend
-    tag: latest
+    tag: 73
     pullPolicy: Always
   service:
     port: 8080
