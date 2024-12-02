@@ -22,7 +22,7 @@ backend:
     targetPort: 8080
   config:
     serverPort: "8080"
-    datasourceUrl: "jdbc:postgresql://postgres-medfast.privatelink.postgres.database.azure.com:5432/medfast"
+    datasourceUrl: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
     datasourceUsername: "user"
     datasourcePassword: "secret123!"
     mailPassword: "pyne podv rskn cqof"
