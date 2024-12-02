@@ -171,6 +171,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   name                   = "postgres-medfast"
   resource_group_name    = var.resource_group_name
   location               = var.location
+  zone                   = "2"
   administrator_login    = "user"
   administrator_password = "secret123!"
   version                = "13"
