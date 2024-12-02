@@ -97,7 +97,7 @@ resource "azurerm_subnet" "postgres_subnet" {
 
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "postgres_dns_zone" {
-  name                = "postgres.database.azure.com"
+  name                = "privatelink.postgres.database.azure.com"
   resource_group_name = var.resource_group_name
 }
 
@@ -168,7 +168,7 @@ resource "helm_release" "nginx_ingress" {
 
 # PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "example" {
-  name                   = "example-psql-flexibleserver"
+  name                   = "postgres-medfast"
   resource_group_name    = var.resource_group_name
   location               = var.location
   administrator_login    = "user"
