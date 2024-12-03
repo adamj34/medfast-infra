@@ -16,12 +16,12 @@ parameters:
     default: dev
 
 variables:
-  - group: "medfast-global-vars"
-  - name: resource_group_name
+  - group: 'medfast-global-vars'
+  - name: resource_group_name  
     ${{ if eq(parameters.environ, 'dev') }}:
-      value: "medfast-rg-dev"
+      value: 'medfast-rg-dev'
     ${{ if eq(parameters.environ, 'prod') }}:
-      value: "medfast-rg-prod"
+      value: 'medfast-rg-prod'
   - name: tag
     value: $(Build.BuildId)
 
@@ -72,31 +72,31 @@ stages:
     jobs:
       - job: DeployAKS
         steps:
-          - task: TerraformInstaller@1
-            displayName: "Install Terraform"
-            inputs:
-              terraformVersion: "1.10.0"
+        - task: TerraformInstaller@1
+          displayName: 'Install Terraform'
+          inputs:
+            terraformVersion: '1.10.0' 
 
-          - task: TerraformTaskV4@4
-            displayName: "Terraform Init"
-            inputs:
-              provider: "azurerm"
-              command: "init"
-              backendServiceArm: $(arm_service_connection)
-              backendAzureRmResourceGroupName: $(resource_group_name)
-              backendAzureRmStorageAccountName: $(storage_account_name)
-              backendAzureRmContainerName: $(storage_container_name)
-              backendAzureRmKey: $(tf_state_file)
-              workingDirectory: "$(System.DefaultWorkingDirectory)/infra/tf/app-cluster"
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Init'
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: $(arm_service_connection)
+            backendAzureRmResourceGroupName: $(resource_group_name)
+            backendAzureRmStorageAccountName: $(storage_account_name)
+            backendAzureRmContainerName: $(storage_container_name)
+            backendAzureRmKey: $(tf_state_file)
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-          # - task: TerraformTaskV4@4
-          #   displayName: "Terraform Destroy"
-          #   inputs:
-          #     provider: "azurerm"
-          #     environmentServiceNameAzureRM: $(arm_service_connection)
-          #     command: "destroy"
-          #     commandOptions: "-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars"
-          #     workingDirectory: "$(System.DefaultWorkingDirectory)/infra/tf/app-cluster"
+        # - task: TerraformTaskV4@4
+        #   displayName: 'Terraform Destroy'
+        #   inputs:
+        #     provider: 'azurerm'
+        #     environmentServiceNameAzureRM: $(arm_service_connection)
+        #     command: 'destroy'
+        #     commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+        #     workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
           displayName: 'Terraform Validate'
@@ -137,7 +137,7 @@ stages:
 
                 - task: HelmInstaller@1
                   displayName: Install Helm
-                  inputs:
+                  inputs: 
                     helmVersionToInstall: '3.16.3'
 
                 - task: HelmDeploy@1
@@ -153,3 +153,4 @@ stages:
                     releaseName: $(helm_release_name)
                     install: true
                     arguments: "--force --cleanup-on-fail --debug"
+    
