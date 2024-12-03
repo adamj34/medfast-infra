@@ -16,12 +16,12 @@ parameters:
     default: dev
 
 variables:
-  - group: 'medfast-global-vars'
-  - name: resource_group_name  
+  - group: "medfast-global-vars"
+  - name: resource_group_name
     ${{ if eq(parameters.environ, 'dev') }}:
-      value: 'medfast-rg-dev'
+      value: "medfast-rg-dev"
     ${{ if eq(parameters.environ, 'prod') }}:
-      value: 'medfast-rg-prod'
+      value: "medfast-rg-prod"
   - name: tag
     value: $(Build.BuildId)
 
@@ -72,85 +72,84 @@ stages:
     jobs:
       - job: DeployAKS
         steps:
-        - task: TerraformInstaller@1
-          displayName: 'Install Terraform'
-          inputs:
-            terraformVersion: '1.10.0' 
+          - task: TerraformInstaller@1
+            displayName: "Install Terraform"
+            inputs:
+              terraformVersion: "1.10.0"
+
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Init"
+            inputs:
+              provider: "azurerm"
+              command: "init"
+              backendServiceArm: $(arm_service_connection)
+              backendAzureRmResourceGroupName: $(resource_group_name)
+              backendAzureRmStorageAccountName: $(storage_account_name)
+              backendAzureRmContainerName: $(storage_container_name)
+              backendAzureRmKey: $(tf_state_file)
+              workingDirectory: "$(System.DefaultWorkingDirectory)/infra/tf/app-cluster"
+
+          # - task: TerraformTaskV4@4
+          #   displayName: "Terraform Destroy"
+          #   inputs:
+          #     provider: "azurerm"
+          #     environmentServiceNameAzureRM: $(arm_service_connection)
+          #     command: "destroy"
+          #     commandOptions: "-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars"
+          #     workingDirectory: "$(System.DefaultWorkingDirectory)/infra/tf/app-cluster"
 
         - task: TerraformTaskV4@4
-          displayName: 'Terraform Init'
+          displayName: 'Terraform Validate'
           inputs:
             provider: 'azurerm'
-            command: 'init'
-            backendServiceArm: $(arm_service_connection)
-            backendAzureRmResourceGroupName: $(resource_group_name)
-            backendAzureRmStorageAccountName: $(storage_account_name)
-            backendAzureRmContainerName: $(storage_container_name)
-            backendAzureRmKey: $(tf_state_file)
+            command: 'validate'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
-          displayName: 'Terraform Destroy'
+          displayName: 'Terraform Plan'
           inputs:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(arm_service_connection)
-            command: 'destroy'
-            commandOptions: '-auto-approve --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+            command: 'plan'
+            commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Validate'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       command: 'validate'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+        - task: TerraformTaskV4@4
+          displayName: 'Terraform Apply'
+          inputs:
+            provider: 'azurerm'
+            environmentServiceNameAzureRM: $(arm_service_connection)
+            command: 'apply'
+            commandOptions: '-auto-approve main.tfplan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Plan'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       environmentServiceNameAzureRM: $(arm_service_connection)
-      #       command: 'plan'
-      #       commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+      - deployment: DeployApp
+        dependsOn: DeployAKS
+        environment: medfast-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubectlInstaller@0
+                  displayName: Install Kubectl
+                  inputs:
+                    kubectlVersion: 'latest'
 
-      #   - task: TerraformTaskV4@4
-      #     displayName: 'Terraform Apply'
-      #     inputs:
-      #       provider: 'azurerm'
-      #       environmentServiceNameAzureRM: $(arm_service_connection)
-      #       command: 'apply'
-      #       commandOptions: '-auto-approve main.tfplan'
-      #       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
+                - task: HelmInstaller@1
+                  displayName: Install Helm
+                  inputs:
+                    helmVersionToInstall: '3.16.3'
 
-      # - deployment: DeployApp
-      #   dependsOn: DeployAKS
-      #   environment: medfast-dev
-      #   strategy:
-      #     runOnce:
-      #       deploy:
-      #         steps:
-      #           - task: KubectlInstaller@0
-      #             displayName: Install Kubectl
-      #             inputs:
-      #               kubectlVersion: 'latest'
-
-      #           - task: HelmInstaller@1
-      #             displayName: Install Helm
-      #             inputs: 
-      #               helmVersionToInstall: '3.16.3'
-
-      #           - task: HelmDeploy@1
-      #             displayName: Deploy Helm Chart
-      #             inputs:
-      #               connectionType: 'Azure Resource Manager'
-      #               azureSubscription: $(arm_service_connection)
-      #               azureResourceGroup: $(resource_group_name)
-      #               kubernetesCluster: $(cluster_name)
-      #               command: 'upgrade'
-      #               chartType: FilePath
-      #               chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
-      #               releaseName: $(helm_release_name)
-      #               install: true
-      #               arguments: "--force --cleanup-on-fail --debug"
-    
+                - task: HelmDeploy@1
+                  displayName: Deploy Helm Chart
+                  inputs:
+                    connectionType: 'Azure Resource Manager'
+                    azureSubscription: $(arm_service_connection)
+                    azureResourceGroup: $(resource_group_name)
+                    kubernetesCluster: $(cluster_name)
+                    command: 'upgrade'
+                    chartType: FilePath
+                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
+                    releaseName: $(helm_release_name)
+                    install: true
+                    arguments: "--force --cleanup-on-fail --debug"

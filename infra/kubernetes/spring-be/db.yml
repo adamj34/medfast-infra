@@ -42,7 +42,7 @@
 #         - name: POSTGRES_USER
 #           value: "user"
 #         - name: POSTGRES_PASSWORD
-#           value: "secret"
+#           value: "secret123!"
 #         - name: POSTGRES_DB
 #           value: "medfast"
 #         - name: SERVER_PORT

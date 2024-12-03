@@ -4,7 +4,8 @@ metadata:
   name: medfast-be-config
 data:
   SERVER_PORT: "8080"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
+  # SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/medfast"
   SPRING_DATASOURCE_USERNAME: "user"
   SPRING_DATASOURCE_PASSWORD: "secret123!"
   MAIL_PASSWORD: "pyne podv rskn cqof"
