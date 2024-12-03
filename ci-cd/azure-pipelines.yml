@@ -148,6 +148,7 @@ stages:
                     azureResourceGroup: $(resource_group_name)
                     kubernetesCluster: $(cluster_name)
                     command: 'upgrade'
+                    namespace: 'medfast'
                     chartType: FilePath
                     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
                     releaseName: $(helm_release_name)

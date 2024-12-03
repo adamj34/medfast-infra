@@ -23,10 +23,14 @@ backend:
   config:
     serverPort: "8080"
     datasourceUrl: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
+    DB_URL: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
     datasourceUsername: "user"
+    DB_USERNAME: "user"
     datasourcePassword: "secret123!"
+    DB_PASSWORD: "secret123"
     mailPassword: "pyne podv rskn cqof"
     activeProfile: "prod"
+    SPRING_PROFILES_ACTIVE: "dev"
 
 ingress:
   className: nginx
