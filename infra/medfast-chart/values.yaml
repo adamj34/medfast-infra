@@ -29,7 +29,7 @@ backend:
     datasourcePassword: "secret123!"
     DB_PASSWORD: "secret123"
     mailPassword: "pyne podv rskn cqof"
-    activeProfile: "prod"
+    activeProfile: "dev"
     SPRING_PROFILES_ACTIVE: "dev"
 
 ingress:
