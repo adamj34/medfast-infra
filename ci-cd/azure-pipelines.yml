@@ -63,7 +63,7 @@ stages:
   #             latest
 
   - stage: Deploy
-    dependsOn: Build
+    # dependsOn: Build
     jobs:
       - job: DeployAKS
         steps:
@@ -116,7 +116,7 @@ stages:
             commandOptions: '-auto-approve main.tfplan --var-file=$(System.DefaultWorkingDirectory)/$(tf_vars_file_name)'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
-      - deployment: DeployApp
+      - deployment: DeployAppBackend
         dependsOn: DeployAKS
         environment: medfast-dev
         strategy:
@@ -147,7 +147,7 @@ stages:
                     install: true
                     arguments: "--force --cleanup-on-fail --debug --atomic"
 
-      - deployment: DeployApp
+      - deployment: DeployAppFrontend
         dependsOn: DeployAKS
         environment: medfast-dev
         strategy:
