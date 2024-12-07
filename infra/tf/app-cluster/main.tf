@@ -1,34 +1,23 @@
 # Resource Group
-resource "azurerm_resource_group" "example" {
+data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
-  location = var.location
 }
 
-# Create a storage account
-resource "random_string" "resource_code" {
-  length  = 5
-  special = false
-  upper   = false
-}
-
-resource "azurerm_storage_account" "tfstate" {
+data "azurerm_storage_account" "tfstate" {
   name                     = "tfstate${random_string.resource_code.result}"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  resource_group_name      = data.azurerm_resource_group.example.name
 }
 
 resource "azurerm_storage_container" "tfstate" {
   name                  = "tfstate"
-  storage_account_id    = azurerm_storage_account.tfstate.id
+  storage_account_id    = data.azurerm_storage_account.tfstate.id
   container_access_type = "private"
 }
 
 # Create a container registry
 resource "azurerm_container_registry" "current" {
   name                = var.container_registry_name
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.example.name
   location            = var.location
   sku                 = "Standard"
 }
@@ -37,14 +26,14 @@ resource "azurerm_container_registry" "current" {
 resource "azurerm_virtual_network" "example" {
   name                = "example-vn"
   location            = var.location
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.example.name
   address_space       = ["10.1.0.0/16"]
 }
 
 # Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
-  resource_group_name  = azurerm_resource_group.example.name
+  resource_group_name  = data.azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.1.1.0/24"]
 }
@@ -52,7 +41,7 @@ resource "azurerm_subnet" "aks_subnet" {
 # Subnet for PostgreSQL
 resource "azurerm_subnet" "postgres_subnet" {
   name                 = "postgres-subnet"
-  resource_group_name  = azurerm_resource_group.example.name
+  resource_group_name  = data.azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.1.2.0/24"]
 
@@ -68,13 +57,13 @@ resource "azurerm_subnet" "postgres_subnet" {
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "postgres_dns_zone" {
   name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.example.name
 }
 
 # Virtual Network Link to Private DNS Zone
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres_dns_link" {
   name                  = "postgres-dns-vnet-link"
-  resource_group_name   = azurerm_resource_group.example.name
+  resource_group_name   = data.azurerm_resource_group.example.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres_dns_zone.name
   virtual_network_id    = azurerm_virtual_network.example.id
 
@@ -85,7 +74,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgres_dns_link" {
 resource "azurerm_kubernetes_cluster" "default" {
   name                = var.cluster_name
   location            = var.location
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.example.name
   dns_prefix          = "${var.app_name}-dns"
   kubernetes_version  = var.k8s_version
 
@@ -141,7 +130,7 @@ resource "helm_release" "nginx_ingress" {
 # PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "example" {
   name                   = "postgres-medfast"
-  resource_group_name    = azurerm_resource_group.example.name
+  resource_group_name    = data.azurerm_resource_group.example.name
   location               = var.location
   zone                   = "1"
   administrator_login    = "user"
