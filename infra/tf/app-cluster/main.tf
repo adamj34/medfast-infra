@@ -3,16 +3,16 @@ data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
 }
 
-data "azurerm_storage_account" "tfstate" {
-  name                = var.storage_account_name
-  resource_group_name      = data.azurerm_resource_group.example.name
-}
+# data "azurerm_storage_account" "tfstate" {
+#   name                = var.storage_account_name
+#   resource_group_name      = data.azurerm_resource_group.example.name
+# }
 
-resource "azurerm_storage_container" "tfstate" {
-  name                  = "tfstate"
-  storage_account_id    = data.azurerm_storage_account.tfstate.id
-  container_access_type = "private"
-}
+# resource "azurerm_storage_container" "tfstate" {
+#   name                  = "tfstate"
+#   storage_account_id    = data.azurerm_storage_account.tfstate.id
+#   container_access_type = "private"
+# }
 
 # Create a container registry
 resource "azurerm_container_registry" "current" {
