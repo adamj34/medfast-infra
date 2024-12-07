@@ -9,13 +9,13 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-
 echo "Generating tfvars file from TF_VAR_ variables"
-TFVARS_FILE="$(System.DefaultWorkingDirectory)/$1"
+TFVARS_FILE="$(SYSTEM_DEFAULT_WORKINGDIRECTORY)/$1"
 touch "$TFVARS_FILE"
 for var in $(printenv | grep '^TF_VAR_' | cut -d= -f1); do
     key=${var#TF_VAR_}  # Removes "TF_VAR_" prefix
     value=${!var}
     echo "${key} = \"${value}\"" >> "$TFVARS_FILE"
 done
+
 cat "$TFVARS_FILE"

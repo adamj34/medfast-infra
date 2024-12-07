@@ -73,6 +73,8 @@ stages:
             filePath: '$(System.DefaultWorkingDirectory)/ci-cd/scripts/retrieve_tf_vars.sh'
             arguments: '$(tf_vars_file_name)'
             failOnStderr: true
+          env:
+            SYSTEM_DEFAULT_WORKINGDIRECTORY: $(System.DefaultWorkingDirectory)
 
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
