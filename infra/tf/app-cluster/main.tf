@@ -1,26 +1,50 @@
 # Resource Group
-data "azurerm_resource_group" "example" {
+resource "azurerm_resource_group" "example" {
   name     = var.resource_group_name
+  location = var.location
 }
 
-# Data source for Container Registry
-data "azurerm_container_registry" "current" {
+# Create a storage account
+resource "random_string" "resource_code" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
+resource "azurerm_storage_account" "tfstate" {
+  name                     = "tfstate${random_string.resource_code.result}"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "tfstate" {
+  name                  = "tfstate"
+  storage_account_id    = azurerm_storage_account.tfstate.id
+  container_access_type = "private"
+}
+
+# Create a container registry
+resource "azurerm_container_registry" "current" {
   name                = var.container_registry_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.example.name
+  location            = var.location
+  sku                 = "Standard"
 }
 
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
   name                = "example-vn"
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.1.0.0/16"]
 }
 
 # Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.1.1.0/24"]
 }
@@ -28,7 +52,7 @@ resource "azurerm_subnet" "aks_subnet" {
 # Subnet for PostgreSQL
 resource "azurerm_subnet" "postgres_subnet" {
   name                 = "postgres-subnet"
-  resource_group_name  = var.resource_group_name
+  resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.1.2.0/24"]
 
@@ -44,29 +68,29 @@ resource "azurerm_subnet" "postgres_subnet" {
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "postgres_dns_zone" {
   name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.example.name
 }
 
 # Virtual Network Link to Private DNS Zone
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres_dns_link" {
   name                  = "postgres-dns-vnet-link"
-  resource_group_name   = var.resource_group_name
+  resource_group_name   = azurerm_resource_group.example.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres_dns_zone.name
   virtual_network_id    = azurerm_virtual_network.example.id
 
-  depends_on = [ azurerm_virtual_network.example ]
+  depends_on = [azurerm_virtual_network.example]
 }
 
 # AKS Cluster
 resource "azurerm_kubernetes_cluster" "default" {
   name                = var.cluster_name
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "${var.app_name}-dns"
   kubernetes_version  = var.k8s_version
 
   default_node_pool {
-    name            = var.node_pool_name
+    name            = var.aks_node_pool_name
     node_count      = var.aks_node_number
     vm_size         = "Standard_D2_v2"
     os_disk_size_gb = 30
@@ -89,7 +113,7 @@ resource "azurerm_kubernetes_cluster" "default" {
 resource "azurerm_role_assignment" "current" {
   principal_id                     = azurerm_kubernetes_cluster.default.kubelet_identity[0].object_id
   role_definition_name             = "AcrPull"
-  scope                            = data.azurerm_container_registry.current.id
+  scope                            = azurerm_container_registry.current.id
   skip_service_principal_aad_check = true
 }
 
@@ -117,7 +141,7 @@ resource "helm_release" "nginx_ingress" {
 # PostgreSQL Flexible Server
 resource "azurerm_postgresql_flexible_server" "example" {
   name                   = "postgres-medfast"
-  resource_group_name    = var.resource_group_name
+  resource_group_name    = azurerm_resource_group.example.name
   location               = var.location
   zone                   = "1"
   administrator_login    = "user"
@@ -126,8 +150,8 @@ resource "azurerm_postgresql_flexible_server" "example" {
   sku_name               = "B_Standard_B1ms"
   storage_mb             = 32768
 
-  delegated_subnet_id = azurerm_subnet.postgres_subnet.id
-  private_dns_zone_id = azurerm_private_dns_zone.postgres_dns_zone.id
+  delegated_subnet_id           = azurerm_subnet.postgres_subnet.id
+  private_dns_zone_id           = azurerm_private_dns_zone.postgres_dns_zone.id
   public_network_access_enabled = false
 
   depends_on = [
@@ -149,8 +173,8 @@ resource "azurerm_postgresql_flexible_server_database" "example" {
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-  name                = "allow-azure-services"
-  server_id           = azurerm_postgresql_flexible_server.example.id 
-  start_ip_address   = "0.0.0.0"
-  end_ip_address     = "0.0.0.0"
+  name             = "allow-azure-services"
+  server_id        = azurerm_postgresql_flexible_server.example.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
 }

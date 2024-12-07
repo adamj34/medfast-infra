@@ -31,12 +31,22 @@ variable "k8s_version" {
   description = "Kubernetes version"
 }
 
-variable "node_pool_name" {
+variable "aks_node_pool_name" {
   type        = string
   description = "Name of the node pool"
 }
 
-# Container Registry
+# Container Registry and Storage Account
+variable "storage_account_name" {
+  type        = string
+  description = "Name of the storage account"
+}
+
+variable "storage_container_name" {
+  type        = string
+  description = "Name of the storage container"
+}
+
 variable "container_registry_name" {
   type        = string
   description = "Name of the container registry"

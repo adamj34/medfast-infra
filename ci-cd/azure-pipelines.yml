@@ -17,11 +17,6 @@ parameters:
 
 variables:
   - group: 'medfast-global-vars'
-  - name: resource_group_name  
-    ${{ if eq(parameters.environ, 'dev') }}:
-      value: 'medfast-rg-dev'
-    ${{ if eq(parameters.environ, 'prod') }}:
-      value: 'medfast-rg-prod'
   - name: tag
     value: $(Build.BuildId)
 
@@ -72,6 +67,13 @@ stages:
     jobs:
       - job: DeployAKS
         steps:
+        - task: Bash@3
+          inputs:
+            targetType: 'filePath'
+            filePath: '$(System.DefaultWorkingDirectory)/ci-cd/scripts/retrieve_tf_vars.sh'
+            arguments: '$(tf_vars_file_name)'
+            failOnStderr: true
+
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
           inputs:
@@ -83,10 +85,10 @@ stages:
             provider: 'azurerm'
             command: 'init'
             backendServiceArm: $(arm_service_connection)
-            backendAzureRmResourceGroupName: $(resource_group_name)
-            backendAzureRmStorageAccountName: $(storage_account_name)
-            backendAzureRmContainerName: $(storage_container_name)
-            backendAzureRmKey: $(tf_state_file)
+            backendAzureRmResourceGroupName: $(TF_VAR_resource_group_name)
+            backendAzureRmStorageAccountName: $(TF_VAR_storage_account_name)
+            backendAzureRmContainerName: $(TF_VAR_storage_container_name)
+            backendAzureRmKey: $(TF_VAR_tf_state_file)
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
@@ -102,7 +104,7 @@ stages:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(arm_service_connection)
             command: 'plan'
-            commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/infra/tf/dev.tfvars'
+            commandOptions: '-out=main.tfplan -input=false --var-file=$(System.DefaultWorkingDirectory)/$(tf_vars_file_name)'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
         - task: TerraformTaskV4@4
@@ -111,7 +113,7 @@ stages:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(arm_service_connection)
             command: 'apply'
-            commandOptions: '-auto-approve main.tfplan'
+            commandOptions: '-auto-approve main.tfplan --var-file=$(System.DefaultWorkingDirectory)/$(tf_vars_file_name)'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
       - deployment: DeployApp
@@ -132,16 +134,47 @@ stages:
                     helmVersionToInstall: '3.16.3'
 
                 - task: HelmDeploy@1
-                  displayName: Deploy Helm Chart
+                  displayName: Deploy Backend Helm Chart
                   inputs:
                     connectionType: 'Azure Resource Manager'
                     azureSubscription: $(arm_service_connection)
-                    azureResourceGroup: $(resource_group_name)
-                    kubernetesCluster: $(cluster_name)
+                    azureResourceGroup: $(TF_VAR_resource_group_name)
+                    kubernetesCluster: $(TF_VAR_cluster_name)
                     command: 'upgrade'
                     chartType: FilePath
-                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-chart'
+                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/backend-chart'
                     releaseName: $(helm_release_name)
                     install: true
-                    arguments: "--force --cleanup-on-fail --debug"
+                    arguments: "--force --cleanup-on-fail --debug --atomic"
+
+      - deployment: DeployApp
+        dependsOn: DeployAKS
+        environment: medfast-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubectlInstaller@0
+                  displayName: Install Kubectl
+                  inputs:
+                    kubectlVersion: 'latest'
+
+                - task: HelmInstaller@1
+                  displayName: Install Helm
+                  inputs: 
+                    helmVersionToInstall: '3.16.3'
+
+                - task: HelmDeploy@1
+                  displayName: Deploy Frontend Helm Chart
+                  inputs:
+                    connectionType: 'Azure Resource Manager'
+                    azureSubscription: $(arm_service_connection)
+                    azureResourceGroup: $(TF_VAR_resource_group_name)
+                    kubernetesCluster: $(TF_VAR_cluster_name)
+                    command: 'upgrade'
+                    chartType: FilePath
+                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/frontend-chart'
+                    releaseName: $(helm_release_name)
+                    install: true
+                    arguments: "--force --cleanup-on-fail --debug --atomic"
     

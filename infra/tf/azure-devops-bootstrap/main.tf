@@ -98,32 +98,3 @@ resource "azurerm_linux_virtual_machine" "current" {
     type = "SystemAssigned"
   }
 }
-
-# Create a storage account
-resource "random_string" "resource_code" {
-  length  = 5
-  special = false
-  upper   = false
-}
-
-resource "azurerm_storage_account" "tfstate" {
-  name                     = "tfstate${random_string.resource_code.result}"
-  resource_group_name      = azurerm_resource_group.medfast_rg.name
-  location                 = azurerm_resource_group.medfast_rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_storage_container" "tfstate" {
-  name                  = "tfstate"
-  storage_account_id    = azurerm_storage_account.tfstate.id
-  container_access_type = "private"
-}
-
-# Create a container registry
-resource "azurerm_container_registry" "current" {
-  name                = var.container_registry_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  sku                 = "Standard"
-}

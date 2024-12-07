@@ -2,7 +2,7 @@
 **/.terraform/*
 
 # .tfstate files
-# *.tfstate
+*.tfstate
 *.tfstate.*
 
 # Crash log files
@@ -38,3 +38,6 @@ terraform.rc
 
 # ignore keys
 tf/azure-devops-bootstrap/keys/*
+
+# ignore environment files
+tf/azure-devops-bootstrap/.env
