@@ -14,6 +14,7 @@ TFVARS_FILE="${SYSTEM_DEFAULT_WORKINGDIRECTORY}/$1"
 touch "$TFVARS_FILE"
 for var in $(printenv | grep '^TF_VAR_' | cut -d= -f1); do
     key=${var#TF_VAR_}  # Removes "TF_VAR_" prefix
+    key=$(echo "$key" | tr '[:upper:]' '[:lower:]')  # Convert to lowercase
     value=${!var}
     echo "${key} = \"${value}\"" >> "$TFVARS_FILE"
 done

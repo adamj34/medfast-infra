@@ -92,6 +92,7 @@ stages:
                 --public-access off
 
       - job: DeployAKS
+        dependsOn: CreateTFBackend
         steps:
         - task: Bash@3
           inputs:
