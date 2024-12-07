@@ -142,7 +142,7 @@ stages:
             provider: 'azurerm'
             environmentServiceNameAzureRM: $(arm_service_connection)
             command: 'apply'
-            commandOptions: '-auto-approve main.tfplan --var-file=$(System.DefaultWorkingDirectory)/$(tf_vars_file_name)'
+            commandOptions: '-auto-approve main.tfplan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/tf/app-cluster'
 
       - deployment: DeployAppBackend
