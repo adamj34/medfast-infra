@@ -4,7 +4,7 @@
 node_modules/
 
 # Ignore environment variables and secrets
-.env
+# .env
 
 # Ignore build folder
 /dist
