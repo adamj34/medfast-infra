@@ -16,6 +16,7 @@ spring:
   liquibase:
     enabled: true
     clear-checksums: true
+    release-locks: true
 
   # Mail Configuration
   mail:
