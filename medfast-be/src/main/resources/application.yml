@@ -17,7 +17,6 @@ spring:
     enabled: false
     clear-checksums: true
 
-
   # Mail Configuration
   mail:
     host: smtp.gmail.com
