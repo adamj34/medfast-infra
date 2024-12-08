@@ -16,7 +16,6 @@ spring:
   liquibase:
     enabled: true
     clear-checksums: true
-    should-run: true
 
   # Mail Configuration
   mail:
