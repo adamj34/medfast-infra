@@ -14,8 +14,9 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev} # Default profile; change to prod as needed
 
   liquibase:
-    enabled: true
+    enabled: false
     clear-checksums: true
+
 
   # Mail Configuration
   mail:
