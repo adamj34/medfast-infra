@@ -9,11 +9,11 @@ service:
   targetPort: 8080
 config:
   serverPort: "8080"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-medfast.postgres.database.azure.com:5432/medfast?sslmode=require"
   SPRING_DATASOURCE_USERNAME: "user"
   SPRING_DATASOURCE_PASSWORD: "secret123!"
   mailPassword: "pyne podv rskn cqof"
-  SPRING_PROFILES_ACTIVE: "dev"
+  SPRING_PROFILES_ACTIVE: "prod"
   
 ingress:
   className: nginx

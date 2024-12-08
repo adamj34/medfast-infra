@@ -13,6 +13,10 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev} # Default profile; change to prod as needed
 
+  liquibase:
+    enabled: true
+    clear-checksums: true
+
   # Mail Configuration
   mail:
     host: smtp.gmail.com
@@ -69,6 +73,7 @@ logging:
         web: debug
         mail: debug
     web: debug
+    liquibase: DEBUG
 
 server:
   error:
