@@ -22,7 +22,7 @@ stages:
 
   - stage: Destroy
     jobs:
-      - job: DestroyAKS
+      - job: DestroyAPP
         steps:
 
         - task: Bash@3

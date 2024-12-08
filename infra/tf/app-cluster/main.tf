@@ -3,25 +3,6 @@ data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
 }
 
-# data "azurerm_storage_account" "tfstate" {
-#   name                = var.storage_account_name
-#   resource_group_name      = data.azurerm_resource_group.example.name
-# }
-
-# resource "azurerm_storage_container" "tfstate" {
-#   name                  = "tfstate"
-#   storage_account_id    = data.azurerm_storage_account.tfstate.id
-#   container_access_type = "private"
-# }
-
-# Create a container registry
-resource "azurerm_container_registry" "current" {
-  name                = var.container_registry_name
-  resource_group_name = data.azurerm_resource_group.example.name
-  location            = var.location
-  sku                 = "Standard"
-}
-
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
   name                = "example-vn"
@@ -144,7 +125,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   public_network_access_enabled = false
 
   depends_on = [
-    azurerm_subnet.postgres_subnet,
+    # azurerm_subnet.postgres_subnet,
     azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
   ]
 }

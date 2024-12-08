@@ -63,36 +63,9 @@ stages:
               latest
 
   - stage: Deploy
-    # dependsOn: Build
+    dependsOn: Build
     jobs:
-      - job: CreateTFBackend
-        steps:
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: $(arm_service_connection)
-            scriptType: 'bash'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              # Create resource group
-              az group create \
-                --name $(TF_VAR_resource_group_name) \
-                --location $(TF_VAR_location)
-
-              # Create storage account
-              az storage account create \
-                --name $(TF_VAR_storage_account_name) \
-                --resource-group $(TF_VAR_resource_group_name) \
-                --location $(TF_VAR_location) \
-                --sku Standard_LRS 
-
-              # Create container
-              az storage container create \
-                --name $(TF_VAR_storage_container_name) \
-                --account-name $(TF_VAR_storage_account_name) \
-                --public-access off
-
       - job: DeployAKS
-        dependsOn: CreateTFBackend
         steps:
         - task: Bash@3
           inputs:
@@ -172,7 +145,7 @@ stages:
                     command: 'upgrade'
                     chartType: FilePath
                     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/backend-chart'
-                    releaseName: $(helm_release_name)
+                    releaseName: $(helm_be_release_name)
                     install: true
                     arguments: "--force --cleanup-on-fail --debug --atomic"
 
@@ -203,7 +176,7 @@ stages:
                     command: 'upgrade'
                     chartType: FilePath
                     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/frontend-chart'
-                    releaseName: $(helm_release_name)
+                    releaseName: $(helm_fe_release_name)
                     install: true
                     arguments: "--force --cleanup-on-fail --debug --atomic"
     
