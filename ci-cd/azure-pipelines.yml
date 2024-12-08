@@ -47,7 +47,6 @@ stages:
             containerRegistry: $(docker_acr_service_connection)
             repository: 'medfast-frontend'
             dockerfile: 'medfast-fe/Dockerfile'
-            buildArguments: '--no-cache'
             tags: |
               $(tag)
               latest
@@ -59,7 +58,6 @@ stages:
             containerRegistry: $(docker_acr_service_connection)
             repository: 'medfast-backend'
             dockerfile: 'medfast-be/Dockerfile'
-            buildArguments: '--no-cache'
             tags: |
               $(tag)
               latest

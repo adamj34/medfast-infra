@@ -65,15 +65,37 @@ verification:
     timeout: 86400
 
 # Logging
+# logging:
+#   level:
+#     org:
+#       springframework:
+#         security: debug
+#         web: debug
+#         mail: debug
+#     web: debug
+#     liquibase: DEBUG
+
 logging:
   level:
     org:
       springframework:
-        security: debug
-        web: debug
-        mail: debug
-    web: debug
-    liquibase: DEBUG
+        jdbc:
+          core: DEBUG  
+          transaction: DEBUG 
+        web: DEBUG  
+        liquibase: DEBUG
+        security: DEBUG 
+        mail: DEBUG  
+        orm: DEBUG  
+        hibernate:
+          SQL: DEBUG  
+          type: DEBUG  
+    com:
+      .zaxxer:
+        hikari: DEBUG  
+    logging:
+      console:
+        enabled: true 
 
 server:
   error:
