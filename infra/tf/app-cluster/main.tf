@@ -132,7 +132,7 @@ resource "azurerm_postgresql_flexible_server" "example" {
   public_network_access_enabled = false
 
   depends_on = [
-    # azurerm_subnet.postgres_subnet,
+    azurerm_subnet.postgres_subnet,
     azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
   ]
 }
