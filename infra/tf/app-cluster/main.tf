@@ -3,6 +3,12 @@ data "azurerm_resource_group" "example" {
   name     = var.resource_group_name
 }
 
+# Container Registry
+data "azurerm_container_registry" "current" {
+  name                = var.container_registry_name
+  resource_group_name = data.azurerm_resource_group.example.name
+}
+
 # Virtual Network
 resource "azurerm_virtual_network" "example" {
   name                = "example-vn"
@@ -83,7 +89,7 @@ resource "azurerm_kubernetes_cluster" "default" {
 resource "azurerm_role_assignment" "current" {
   principal_id                     = azurerm_kubernetes_cluster.default.kubelet_identity[0].object_id
   role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.current.id
+  scope                            = data.azurerm_container_registry.current.id
   skip_service_principal_aad_check = true
 }
 
