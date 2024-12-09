@@ -349,7 +349,7 @@ ALTER TABLE test_appointments
 -- rollback ALTER TABLE test_appointments DROP CONSTRAINT appointment_statuses__fk;
 
 -- changeset Anton.Dybko:5_MED_107_Medical_Tests
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+-- CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- rollback DROP EXTENSION pg_trgm;
 
 -- changeset Anton.Dybko:41_MED_228_Doctors_Registration
