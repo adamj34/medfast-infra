@@ -90,12 +90,6 @@ logging:
         hibernate:
           SQL: DEBUG  
           type: DEBUG  
-    com:
-      .zaxxer:
-        hikari: DEBUG  
-    logging:
-      console:
-        enabled: true 
 
 server:
   error:
