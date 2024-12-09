@@ -137,6 +137,12 @@ resource "azurerm_postgresql_flexible_server" "example" {
   ]
 }
 
+resource "azurerm_postgresql_flexible_server_configuration" "extensions" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.example.id
+  value     = "pg_trgm"
+}
+
 resource "azurerm_postgresql_flexible_server_database" "example" {
   name      = "medfast"
   server_id = azurerm_postgresql_flexible_server.example.id
