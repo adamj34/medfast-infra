@@ -39,7 +39,7 @@ resource "azurerm_subnet" "postgres_subnet" {
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
-  depends_on = [ azurerm_postgresql_flexible_server.example ]
+  # depends_on = [ azurerm_postgresql_flexible_server.example ]
 }
 
 # Private DNS Zone for PostgreSQL
