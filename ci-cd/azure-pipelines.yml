@@ -51,16 +51,17 @@ stages:
         #       $(tag)
         #       latest
 
-        # - task: Docker@2
-        #   displayName: Build and publish backend image to Azure Container Registry
-        #   inputs:
-        #     command: buildAndPush
-        #     containerRegistry: $(docker_acr_service_connection)
-        #     repository: 'medfast-backend'
-        #     dockerfile: 'medfast-be/Dockerfile'
-        #     tags: |
-        #       $(tag)
-        #       latest
+        - task: Docker@2
+          displayName: Build and publish backend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(docker_acr_service_connection)
+            repository: 'medfast-backend'
+            dockerfile: 'medfast-be/Dockerfile'
+            buildArguments: "--no-cache"
+            tags: |
+              $(tag)
+              latest
 
   - stage: Deploy
     dependsOn: Build
