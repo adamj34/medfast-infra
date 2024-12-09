@@ -82,14 +82,14 @@ logging:
         jdbc:
           core: DEBUG  
           transaction: DEBUG 
-        web: DEBUG  
-        liquibase: DEBUG
-        security: DEBUG 
-        mail: DEBUG  
-        orm: DEBUG  
-        hibernate:
-          SQL: DEBUG  
-          type: DEBUG  
+      web: DEBUG  
+      liquibase: DEBUG
+      security: DEBUG 
+      mail: DEBUG  
+      orm: DEBUG  
+      hibernate:
+        SQL: DEBUG  
+        type: DEBUG  
 
 server:
   error:
