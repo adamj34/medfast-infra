@@ -149,34 +149,34 @@ stages:
                     install: true
                     arguments: "--force --cleanup-on-fail --debug --atomic"
 
-      - deployment: DeployAppFrontend
-        dependsOn: DeployAKS
-        environment: medfast-dev
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: KubectlInstaller@0
-                  displayName: Install Kubectl
-                  inputs:
-                    kubectlVersion: 'latest'
+      # - deployment: DeployAppFrontend
+      #   dependsOn: DeployAKS
+      #   environment: medfast-dev
+      #   strategy:
+      #     runOnce:
+      #       deploy:
+      #         steps:
+      #           - task: KubectlInstaller@0
+      #             displayName: Install Kubectl
+      #             inputs:
+      #               kubectlVersion: 'latest'
 
-                - task: HelmInstaller@1
-                  displayName: Install Helm
-                  inputs: 
-                    helmVersionToInstall: '3.16.3'
+      #           - task: HelmInstaller@1
+      #             displayName: Install Helm
+      #             inputs: 
+      #               helmVersionToInstall: '3.16.3'
 
-                - task: HelmDeploy@1
-                  displayName: Deploy Frontend Helm Chart
-                  inputs:
-                    connectionType: 'Azure Resource Manager'
-                    azureSubscription: $(arm_service_connection)
-                    azureResourceGroup: $(TF_VAR_resource_group_name)
-                    kubernetesCluster: $(TF_VAR_cluster_name)
-                    command: 'upgrade'
-                    chartType: FilePath
-                    chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/frontend-chart'
-                    releaseName: $(helm_fe_release_name)
-                    install: true
-                    arguments: "--force --cleanup-on-fail --debug --atomic"
+      #           - task: HelmDeploy@1
+      #             displayName: Deploy Frontend Helm Chart
+      #             inputs:
+      #               connectionType: 'Azure Resource Manager'
+      #               azureSubscription: $(arm_service_connection)
+      #               azureResourceGroup: $(TF_VAR_resource_group_name)
+      #               kubernetesCluster: $(TF_VAR_cluster_name)
+      #               command: 'upgrade'
+      #               chartType: FilePath
+      #               chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/frontend-chart'
+      #               releaseName: $(helm_fe_release_name)
+      #               install: true
+      #               arguments: "--force --cleanup-on-fail --debug --atomic"
     
