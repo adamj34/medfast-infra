@@ -45,7 +45,8 @@ stages:
 
         - task: Gradle@3
           inputs:
-            gradleWrapperFile: 'medfast-be/gradlew'
+            workingDirectory: 'medfast-be'
+            gradleWrapperFile: 'gradlew'
             javaHomeOption: 'JDKVersion'
             jdkVersionOption: '1.17'
             jdkArchitectureOption: 'x64'
@@ -53,7 +54,6 @@ stages:
             testResultsFiles: '**/TEST-*.xml'
             tasks: 'test'
             options: '--no-daemon'
-
 
   - stage: Build
     dependsOn: Test
