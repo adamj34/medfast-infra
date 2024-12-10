@@ -30,10 +30,10 @@ stages:
       - job: RunTests
         steps:
 
-        - task: DownloadFile@1
-          inputs:
-            uri: 'https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz'
-            downloadPath: '$(Agent.TempDirectory)'
+        - script: |
+            mkdir -p $(Agent.TempDirectory)
+            curl -L -o $(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz"
+          displayName: 'Download JDK 17'
 
         - task: JavaToolInstaller@0
           inputs:
