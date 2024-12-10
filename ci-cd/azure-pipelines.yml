@@ -46,7 +46,7 @@ stages:
         - task: Gradle@3
           inputs:
             workingDirectory: 'medfast-be'
-            gradleWrapperFile: 'gradlew'
+            gradleWrapperFile: 'medfast-be/gradlew'
             javaHomeOption: 'JDKVersion'
             jdkVersionOption: '1.17'
             jdkArchitectureOption: 'x64'
