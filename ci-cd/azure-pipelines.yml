@@ -80,6 +80,7 @@ stages:
             failOnStderr: true
           env:
             SYSTEM_DEFAULT_WORKINGDIRECTORY: $(System.DefaultWorkingDirectory)
+            TF_VAR_postgres_server_admin_passwd: $(TF_VAR_postgres_server_admin_passwd) # Required to map secret to env manually
 
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
