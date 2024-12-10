@@ -157,7 +157,7 @@ public class DoctorServiceTests {
 
     assertThrows(EntityNotFoundException.class, () -> {
       doctorService.getAvailableTimeSlotsForPatientAndDoctor(
-          authenticatedUser, doctor.getId(), service.getId(), locationId, month, year);
+          authenticatedUser, doctor.getId(), service.getId(), locationId, 10, year);
     });
 
     verify(hospitalServiceService).findById(service.getId());
