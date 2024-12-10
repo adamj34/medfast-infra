@@ -1,3 +1,4 @@
+# General
 variable "app_name" {
   type        = string
   description = "Name of the application"
@@ -36,6 +37,12 @@ variable "aks_node_pool_name" {
   description = "Name of the node pool"
 }
 
+variable "aks_vm_size" {
+  type        = string
+  description = "Size of the VMs"
+}
+
+
 # Container Registry and Storage Account
 variable "storage_account_name" {
   type        = string
@@ -50,4 +57,37 @@ variable "storage_container_name" {
 variable "container_registry_name" {
   type        = string
   description = "Name of the container registry"
+}
+
+
+# PostgreSQL Flexible Server
+variable "postgres_server_name" {
+  type        = string
+  description = "Name of the PostgreSQL server"
+}
+
+variable "postgres_server_admin_login" {
+  type        = string
+  description = "Admin login for the PostgreSQL server"
+}
+
+variable "postgres_server_admin_passwd" {
+  type        = string
+  description = "Admin password for the PostgreSQL server"
+  sensitive   = true
+}
+
+variable "postgres_server_sku_name" {
+  type        = string
+  description = "SKU name for the PostgreSQL server"
+}
+
+variable "postgres_server_app_db_name" {
+  type        = string
+  description = "Name of the application database"
+}
+
+variable "postgres_server_storage_mb" {
+  type        = number
+  description = "Storage size in MB"  
 }

@@ -1,35 +1,35 @@
 # Resource Group
-data "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+data "azurerm_resource_group" "current" {
+  name = var.resource_group_name
 }
 
 # Container Registry
 data "azurerm_container_registry" "current" {
   name                = var.container_registry_name
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.current.name
 }
 
 # Virtual Network
-resource "azurerm_virtual_network" "example" {
-  name                = "example-vn"
+resource "azurerm_virtual_network" "current" {
+  name                = "app-vn"
   location            = var.location
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.current.name
   address_space       = ["10.1.0.0/16"]
 }
 
 # Subnet for AKS
 resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
-  resource_group_name  = data.azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.example.name
+  resource_group_name  = data.azurerm_resource_group.current.name
+  virtual_network_name = azurerm_virtual_network.current.name
   address_prefixes     = ["10.1.1.0/24"]
 }
 
 # Subnet for PostgreSQL
 resource "azurerm_subnet" "postgres_subnet" {
   name                 = "postgres-subnet"
-  resource_group_name  = data.azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.example.name
+  resource_group_name  = data.azurerm_resource_group.current.name
+  virtual_network_name = azurerm_virtual_network.current.name
   address_prefixes     = ["10.1.2.0/24"]
 
   delegation {
@@ -39,37 +39,36 @@ resource "azurerm_subnet" "postgres_subnet" {
       actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
     }
   }
-  # depends_on = [ azurerm_postgresql_flexible_server.example ]
 }
 
 # Private DNS Zone for PostgreSQL
 resource "azurerm_private_dns_zone" "postgres_dns_zone" {
   name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.current.name
 }
 
 # Virtual Network Link to Private DNS Zone
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres_dns_link" {
   name                  = "postgres-dns-vnet-link"
-  resource_group_name   = data.azurerm_resource_group.example.name
+  resource_group_name   = data.azurerm_resource_group.current.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres_dns_zone.name
-  virtual_network_id    = azurerm_virtual_network.example.id
+  virtual_network_id    = azurerm_virtual_network.current.id
 
-  depends_on = [azurerm_virtual_network.example]
+  depends_on = [azurerm_virtual_network.current]
 }
 
 # AKS Cluster
 resource "azurerm_kubernetes_cluster" "default" {
   name                = var.cluster_name
   location            = var.location
-  resource_group_name = data.azurerm_resource_group.example.name
+  resource_group_name = data.azurerm_resource_group.current.name
   dns_prefix          = "${var.app_name}-dns"
   kubernetes_version  = var.k8s_version
 
   default_node_pool {
     name            = var.aks_node_pool_name
     node_count      = var.aks_node_number
-    vm_size         = "Standard_D2_v2"
+    vm_size         = var.aks_vm_size
     os_disk_size_gb = 30
     vnet_subnet_id  = azurerm_subnet.aks_subnet.id
   }
@@ -116,36 +115,36 @@ resource "helm_release" "nginx_ingress" {
 }
 
 # PostgreSQL Flexible Server
-resource "azurerm_postgresql_flexible_server" "example" {
-  name                   = "postgres-medfast"
-  resource_group_name    = data.azurerm_resource_group.example.name
+resource "azurerm_postgresql_flexible_server" "current" {
+  name                   = var.postgres_server_name
+  resource_group_name    = data.azurerm_resource_group.current.name
   location               = var.location
   zone                   = "1"
-  administrator_login    = "user"
-  administrator_password = "secret123!"
+  administrator_login    = var.postgres_server_admin_login
+  administrator_password = var.postgres_server_admin_passwd
   version                = "13"
-  sku_name               = "B_Standard_B1ms"
-  storage_mb             = 32768
+  sku_name               = var.postgres_server_sku_name
+  storage_mb             = var.postgres_server_storage_mb
 
   delegated_subnet_id           = azurerm_subnet.postgres_subnet.id
   private_dns_zone_id           = azurerm_private_dns_zone.postgres_dns_zone.id
   public_network_access_enabled = false
 
-  depends_on = [
-    # azurerm_subnet.postgres_subnet,
-    azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
-  ]
+  # depends_on = [
+  #   # azurerm_subnet.postgres_subnet,
+  #   azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
+  # ]
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "extensions" {
   name      = "azure.extensions"
-  server_id = azurerm_postgresql_flexible_server.example.id
+  server_id = azurerm_postgresql_flexible_server.current.id
   value     = "pg_trgm"
 }
 
-resource "azurerm_postgresql_flexible_server_database" "example" {
-  name      = "medfast"
-  server_id = azurerm_postgresql_flexible_server.example.id
+resource "azurerm_postgresql_flexible_server_database" "current" {
+  name      = var.postgres_server_app_db_name
+  server_id = azurerm_postgresql_flexible_server.current.id
   collation = "en_US.utf8"
   charset   = "utf8"
 
@@ -155,9 +154,9 @@ resource "azurerm_postgresql_flexible_server_database" "example" {
   }
 }
 
-resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-  name             = "allow-azure-services"
-  server_id        = azurerm_postgresql_flexible_server.example.id
-  start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
-}
+# resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+#   name             = "allow-azure-services"
+#   server_id        = azurerm_postgresql_flexible_server.current.id
+#   start_ip_address = "0.0.0.0"
+#   end_ip_address   = "0.0.0.0"
+# }
