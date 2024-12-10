@@ -29,14 +29,19 @@ stages:
     jobs:
       - job: RunTests
         steps:
-
         - task: JavaToolInstaller@0
           inputs:
             versionSpec: '17'
             jdkArchitectureOption: 'x64'
-            jdkSourceOption: 'AzureStorage'
-            azureResourceManagerEndpoint: $(arm_service_connection)
-            jdkSourcePath: 'https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz'
+            jdkSourceOption: 'Adoptium'
+
+        # - task: JavaToolInstaller@0
+        #   inputs:
+        #     versionSpec: '17'
+        #     jdkArchitectureOption: 'x64'
+        #     jdkSourceOption: 'AzureStorage'
+        #     azureResourceManagerEndpoint: $(arm_service_connection)
+        #     jdkSourcePath: 'https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz'
 
         - task: Gradle@3
           inputs:
