@@ -154,12 +154,12 @@ resource "azurerm_postgresql_flexible_server_database" "current" {
   }
 }
 
-# resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
-#   name             = "allow-azure-services"
-#   server_id        = azurerm_postgresql_flexible_server.current.id
-#   start_ip_address = "0.0.0.0"
-#   end_ip_address   = "0.0.0.0"
-# }
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+  name             = "allow-azure-services"
+  server_id        = azurerm_postgresql_flexible_server.current.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
 
 # resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_aks_cluster" {
 #   name             = "allow-aks-cluster"
@@ -167,8 +167,8 @@ resource "azurerm_postgresql_flexible_server_database" "current" {
 #   start_ip_address = azurerm_subnet.aks_subnet.address_prefixes[0]
 #   end_ip_address   = azurerm_subnet.aks_subnet.address_prefixes[0]
 # }
-resource "azurerm_postgresql_flexible_server_vnet_rule" "allow_aks_subnet" {
-  name      = "allow-aks-subnet"
-  server_id = azurerm_postgresql_flexible_server.current.id
-  subnet_id = azurerm_subnet.aks_subnet.id
-}
+# resource "azurerm_postgresql_virtual_network_rule" "allow_aks_subnet" {
+#   name      = "allow-aks-subnet"
+#   server_id = azurerm_postgresql_flexible_server.current.id
+#   subnet_id = azurerm_subnet.aks_subnet.id
+# }
