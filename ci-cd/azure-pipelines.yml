@@ -24,80 +24,81 @@ variables:
     value: $(Build.BuildId)
 
 stages:
-  # - stage: Test
-  #   jobs:
-  #     - job: RunTests
-  #       steps:
-  #       - script: |
-  #           mkdir -p $(Agent.TempDirectory)
-  #           curl -L -o $(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz"
-  #         displayName: 'Download JDK 17'
+  - stage: Test
+    jobs:
+      - job: RunTests
+        steps:
+        - script: |
+            mkdir -p $(Agent.TempDirectory)
+            curl -L -o $(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz"
+          displayName: 'Download JDK 17'
 
-  #       - task: JavaToolInstaller@0
-  #         inputs:
-  #           versionSpec: '17'
-  #           jdkArchitectureOption: 'x64'
-  #           jdkSourceOption: 'LocalDirectory'
-  #           jdkFile: '$(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz'
-  #           jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk17'
+        - task: JavaToolInstaller@0
+          inputs:
+            versionSpec: '17'
+            jdkArchitectureOption: 'x64'
+            jdkSourceOption: 'LocalDirectory'
+            jdkFile: '$(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz'
+            jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk17'
 
-  #       - task: Gradle@3
-  #         inputs:
-  #           workingDirectory: 'medfast-be'
-  #           gradleWrapperFile: 'medfast-be/gradlew'
-  #           javaHomeOption: 'JDKVersion'
-  #           jdkVersionOption: '1.17'
-  #           jdkArchitectureOption: 'x64'
-  #           publishJUnitResults: true
-  #           testResultsFiles: '**/TEST-*.xml'
-  #           tasks: 'test'
-  #           options: '--no-daemon'
+        - task: Gradle@3
+          inputs:
+            workingDirectory: 'medfast-be'
+            gradleWrapperFile: 'medfast-be/gradlew'
+            javaHomeOption: 'JDKVersion'
+            jdkVersionOption: '1.17'
+            jdkArchitectureOption: 'x64'
+            publishJUnitResults: true
+            testResultsFiles: '**/TEST-*.xml'
+            tasks: 'test'
+            options: '--no-daemon'
 
-  # - stage: Build
-  #   dependsOn: Test
-  #   jobs:
-  #     - job: BuildAndPushImages
-  #       steps:
-  #       - script: |
-  #           # Install Docker
-  #           curl -fsSL https://get.docker.com -o get-docker.sh
-  #           sudo sh get-docker.sh
+  - stage: Build
+    dependsOn: Test
+    jobs:
+      - job: BuildAndPushImages
+        steps:
+        - script: |
+            # Install Docker
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
 
-  #           sudo systemctl start docker
-  #           sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo systemctl enable docker
 
-  #           sudo chmod 666 /var/run/docker.sock
-  #           sudo usermod -aG docker $USER
+            sudo chmod 666 /var/run/docker.sock
+            sudo usermod -aG docker $USER
 
-  #           # Verify Docker is running
-  #           sudo docker ps || (echo "Docker daemon not running" && exit 1)
-  #         displayName: 'Setup Docker'
+            # Verify Docker is running
+            sudo docker ps || (echo "Docker daemon not running" && exit 1)
+          displayName: 'Setup Docker'
           
-  #       - task: Docker@2
-  #         displayName: Build and publish frontend image to Azure Container Registry
-  #         inputs:
-  #           command: buildAndPush
-  #           containerRegistry: $(docker_acr_service_connection)
-  #           repository: 'medfast-frontend'
-  #           dockerfile: 'medfast-fe/Dockerfile'
-  #           tags: |
-  #             $(tag)
-  #             latest
+        - task: Docker@2
+          displayName: Build and publish frontend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(docker_acr_service_connection)
+            repository: 'medfast-frontend'
+            dockerfile: 'medfast-fe/Dockerfile'
+            # buildArguments: "--no-cache"
+            tags: |
+              $(tag)
+              latest
 
-  #       - task: Docker@2
-  #         displayName: Build and publish backend image to Azure Container Registry
-  #         inputs:
-  #           command: buildAndPush
-  #           containerRegistry: $(docker_acr_service_connection)
-  #           repository: 'medfast-backend'
-  #           dockerfile: 'medfast-be/Dockerfile'
-  #           # buildArguments: "--no-cache"
-  #           tags: |
-  #             $(tag)
-  #             latest
+        - task: Docker@2
+          displayName: Build and publish backend image to Azure Container Registry
+          inputs:
+            command: buildAndPush
+            containerRegistry: $(docker_acr_service_connection)
+            repository: 'medfast-backend'
+            dockerfile: 'medfast-be/Dockerfile'
+            buildArguments: "--no-cache"
+            tags: |
+              $(tag)
+              latest
 
   - stage: Deploy
-    # dependsOn: Build
+    dependsOn: Build
     jobs:
       - job: DeployAKS
         steps:
