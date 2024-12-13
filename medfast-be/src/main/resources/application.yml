@@ -64,17 +64,6 @@ verification:
   code:
     timeout: 86400
 
-# Logging
-# logging:
-#   level:
-#     org:
-#       springframework:
-#         security: debug
-#         web: debug
-#         mail: debug
-#     web: debug
-#     liquibase: DEBUG
-
 logging:
   level:
     org:

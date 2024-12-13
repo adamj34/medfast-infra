@@ -130,10 +130,10 @@ resource "azurerm_postgresql_flexible_server" "current" {
   private_dns_zone_id           = azurerm_private_dns_zone.postgres_dns_zone.id
   public_network_access_enabled = false
 
-  # depends_on = [
-  #   # azurerm_subnet.postgres_subnet,
-  #   azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
-  # ]
+  depends_on = [
+    # azurerm_subnet.postgres_subnet,
+    azurerm_private_dns_zone_virtual_network_link.postgres_dns_link
+  ]
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "extensions" {
@@ -160,3 +160,10 @@ resource "azurerm_postgresql_flexible_server_database" "current" {
 #   start_ip_address = "0.0.0.0"
 #   end_ip_address   = "0.0.0.0"
 # }
+
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_aks_cluster" {
+  name             = "allow-aks-cluster"
+  server_id        = azurerm_postgresql_flexible_server.current.id
+  start_ip_address = azurerm_subnet.aks_subnet.address_prefix
+  end_ip_address   = azurerm_subnet.aks_subnet.address_prefix
+}
