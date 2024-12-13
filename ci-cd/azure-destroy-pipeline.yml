@@ -36,7 +36,7 @@ stages:
             failOnStderr: true
           env:
             SYSTEM_DEFAULT_WORKINGDIRECTORY: $(System.DefaultWorkingDirectory)
-            TF_VAR_postgres_server_admin_passwd: $(TF_VAR_postgres_server_admin_passwd)
+            # TF_VAR_postgres_server_admin_passwd: $(TF_VAR_postgres_server_admin_passwd)
         - task: TerraformInstaller@1
           displayName: 'Install Terraform'
           inputs:
