@@ -16,7 +16,6 @@ parameters:
     default: dev
 
 variables:
-  # - group: 'medfast-global-vars'
   - ${{ if eq(parameters.environ, 'dev') }}:
     - group: 'medfast-global-vars-dev'
   - ${{ if eq(parameters.environ, 'prod') }}:
@@ -183,7 +182,7 @@ stages:
                     chartPath: '$(System.DefaultWorkingDirectory)/infra/medfast-charts/backend-chart'
                     releaseName: $(helm_be_release_name)
                     install: true
-                    arguments: "--force --cleanup-on-fail --debug --atomic"
+                    arguments: "--force --cleanup-on-fail --debug --atomic --timeout 3m0s --wait"
 
       - deployment: DeployAppFrontend
         dependsOn: DeployAKS
