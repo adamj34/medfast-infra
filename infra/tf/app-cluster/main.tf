@@ -160,15 +160,3 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_service
   start_ip_address = "0.0.0.0"
   end_ip_address   = "0.0.0.0"
 }
-
-# resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_aks_cluster" {
-#   name             = "allow-aks-cluster"
-#   server_id        = azurerm_postgresql_flexible_server.current.id
-#   start_ip_address = azurerm_subnet.aks_subnet.address_prefixes[0]
-#   end_ip_address   = azurerm_subnet.aks_subnet.address_prefixes[0]
-# }
-# resource "azurerm_postgresql_virtual_network_rule" "allow_aks_subnet" {
-#   name      = "allow-aks-subnet"
-#   server_id = azurerm_postgresql_flexible_server.current.id
-#   subnet_id = azurerm_subnet.aks_subnet.id
-# }
