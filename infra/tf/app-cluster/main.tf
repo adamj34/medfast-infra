@@ -164,6 +164,6 @@ resource "azurerm_postgresql_flexible_server_database" "current" {
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_aks_cluster" {
   name             = "allow-aks-cluster"
   server_id        = azurerm_postgresql_flexible_server.current.id
-  start_ip_address = azurerm_subnet.aks_subnet.address_prefix
-  end_ip_address   = azurerm_subnet.aks_subnet.address_prefix
+  start_ip_address = azurerm_subnet.aks_subnet.address_prefixes[0]
+  end_ip_address   = azurerm_subnet.aks_subnet.address_prefixes[0]
 }

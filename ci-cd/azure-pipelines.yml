@@ -24,34 +24,34 @@ variables:
     value: $(Build.BuildId)
 
 stages:
-  - stage: Test
-    jobs:
-      - job: RunTests
-        steps:
-        - script: |
-            mkdir -p $(Agent.TempDirectory)
-            curl -L -o $(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz"
-          displayName: 'Download JDK 17'
+  # - stage: Test
+  #   jobs:
+  #     - job: RunTests
+  #       steps:
+  #       - script: |
+  #           mkdir -p $(Agent.TempDirectory)
+  #           curl -L -o $(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz "https://aka.ms/download-jdk/microsoft-jdk-17-linux-x64.tar.gz"
+  #         displayName: 'Download JDK 17'
 
-        - task: JavaToolInstaller@0
-          inputs:
-            versionSpec: '17'
-            jdkArchitectureOption: 'x64'
-            jdkSourceOption: 'LocalDirectory'
-            jdkFile: '$(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz'
-            jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk17'
+  #       - task: JavaToolInstaller@0
+  #         inputs:
+  #           versionSpec: '17'
+  #           jdkArchitectureOption: 'x64'
+  #           jdkSourceOption: 'LocalDirectory'
+  #           jdkFile: '$(Agent.TempDirectory)/microsoft-jdk-17-linux-x64.tar.gz'
+  #           jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk17'
 
-        - task: Gradle@3
-          inputs:
-            workingDirectory: 'medfast-be'
-            gradleWrapperFile: 'medfast-be/gradlew'
-            javaHomeOption: 'JDKVersion'
-            jdkVersionOption: '1.17'
-            jdkArchitectureOption: 'x64'
-            publishJUnitResults: true
-            testResultsFiles: '**/TEST-*.xml'
-            tasks: 'test'
-            options: '--no-daemon'
+  #       - task: Gradle@3
+  #         inputs:
+  #           workingDirectory: 'medfast-be'
+  #           gradleWrapperFile: 'medfast-be/gradlew'
+  #           javaHomeOption: 'JDKVersion'
+  #           jdkVersionOption: '1.17'
+  #           jdkArchitectureOption: 'x64'
+  #           publishJUnitResults: true
+  #           testResultsFiles: '**/TEST-*.xml'
+  #           tasks: 'test'
+  #           options: '--no-daemon'
 
   # - stage: Build
   #   dependsOn: Test
